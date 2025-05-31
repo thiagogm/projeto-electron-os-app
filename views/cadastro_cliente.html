@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';">
+    <title>Cadastro de Clientes</title>
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#" id="goHome">Home</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="goHomeNav">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Cadastro de Clientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="goToOsPage">Ordens de Serviço</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Cadastro de Clientes</h2>
+        <hr>
+
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <label for="searchInput" class="form-label">Buscar Cliente (Nome ou CPF)</label>
+                <input type="text" class="form-control" id="searchInput" placeholder="Digite para buscar...">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button class="btn btn-primary w-100" id="searchButton">Buscar</button>
+            </div>
+        </div>
+        <div id="searchResults" class="list-group mb-3" style="max-height: 200px; overflow-y: auto;">
+            </div>
+        <hr>
+
+        <form id="clientForm">
+            <input type="hidden" id="clientId"> <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label for="name" class="form-label">Nome Completo*</label>
+                    <input type="text" class="form-control" id="name" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="cpf" class="form-label">CPF*</label>
+                    <input type="text" class="form-control" id="cpf" placeholder="000.000.000-00" required>
+                    <div class="invalid-feedback" id="cpfError">CPF inválido ou já cadastrado.</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="cep" class="form-label">CEP</label>
+                    <input type="text" class="form-control" id="cep" placeholder="00000-000">
+                </div>
+                <div class="col-md-7 mb-3">
+                    <label for="address" class="form-label">Endereço</label>
+                    <input type="text" class="form-control" id="address" readonly>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="number" class="form-label">Número</label>
+                    <input type="text" class="form-control" id="number">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="complement" class="form-label">Complemento</label>
+                    <input type="text" class="form-control" id="complement">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="neighborhood" class="form-label">Bairro</label>
+                    <input type="text" class="form-control" id="neighborhood" readonly>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="city" class="form-label">Cidade</label>
+                    <input type="text" class="form-control" id="city" readonly>
+                </div>
+                <div class="col-md-1 mb-3">
+                    <label for="state" class="form-label">UF</label>
+                    <input type="text" class="form-control" id="state" readonly>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="phone" class="form-label">Telefone/Celular</label>
+                    <input type="tel" class="form-control" id="phone" placeholder="(00) 00000-0000">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" class="form-control" id="email">
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="notes" class="form-label">Observações</label>
+                <textarea class="form-control" id="notes" rows="3"></textarea>
+            </div>
+
+            <div id="formFeedback" class="alert d-none" role="alert"></div>
+
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary me-2" id="clearFormButton">Limpar</button>
+                <button type="button" class="btn btn-danger me-2 d-none" id="deleteButton">Excluir</button>
+                <button type="submit" class="btn btn-success" id="saveButton">Salvar Cliente</button>
+            </div>
+        </form>
+        <hr>
+        <small class="text-muted">* Campos obrigatórios</small>
+    </div>
+
+    <footer class="fixed-bottom bg-light text-dark p-2 border-top">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>Data: <span id="currentDate"></span></div>
+            <div>Status DB: <img id="dbStatusIcon" src="../assets/icons/database-slash.png" alt="DB Status" width="20" height="20"> <span id="dbStatusText">Desconectado</span></div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/cpf_validator.js"></script>
+    <script src="../assets/js/cep.js"></script>
+    <script src="../assets/js/renderer_cliente.js"></script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+/* assets/css/style.css */
+
+body {
+    font-family: sans-serif;
+    padding-bottom: 60px; /* Para não sobrepor o footer */
+}
+
+/* Nova cor de fundo para a home page (ou body em geral) */
+.body-home {
+    background-color: #86b8f8; /* Um cinza bem claro (Bootstrap 'light' color) */
+    /* Outras opções:
+       background-color: #eef1f5; (um azul acinzentado bem claro)
+       background-color: #f4f7f6; (um verde acinzentado bem claro)
+    */
+}
+
+.custom-card {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.1s ease; /* Adicionada transição para background-color */
+    border: none; /* Remove a borda padrão do card para um visual mais suave */
+}
+
+.custom-card:hover {
+    transform: translateY(-7px); /* Aumenta um pouco o efeito de elevação */
+    box-shadow: 0 0.75rem 1.5rem rgba(0,0,0,.18)!important; /* Sombra um pouco mais pronunciada */
+}
+
+/* Estilo para o logo na tela principal */
+.app-logo-principal {
+    max-width: 180px; /* Pode ajustar conforme seu logo */
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1.5rem; /* Um pouco mais de espaço abaixo do logo */
+}
+
+/* Cores pastéis para os cards */
+.card-clientes-pastel {
+    background-color: #48abb8; /* Azul pastel bem clarinho (tipo 'Light Cyan') */
+    /* Outra opção: background-color: #d1e7fd; (Bootstrap 'info-bg-subtle') */
+}
+
+.card-clientes-pastel:hover {
+    background-color: #b3e5fc; /* Um tom um pouco mais escuro do azul pastel no hover */
+}
+
+.card-os-pastel {
+    background-color: #42da51d0; /* Verde pastel bem clarinho (tipo 'Light Green') */
+    /* Outra opção: background-color: #d1f2eb; (Bootstrap 'success-bg-subtle') */
+}
+
+.card-os-pastel:hover {
+    background-color: #c8e6c9; /* Um tom um pouco mais escuro do verde pastel no hover */
+}
+
+/* Ajustar a cor do texto dentro dos cards pastéis se necessário para contraste */
+.card-clientes-pastel .card-title,
+.card-clientes-pastel .card-text,
+.card-os-pastel .card-title,
+.card-os-pastel .card-text {
+    color: #333; /* Garante que o texto seja escuro o suficiente */
+}
+
+/* Estilo para campo de CPF inválido/duplicado */
+.is-invalid-cpf {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+}
+
+#dbStatusIcon {
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
+.client-list-item {
+    cursor: pointer;
+}
+.client-list-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Estilo para o logo na tela principal */
+.app-logo-principal {
+    max-width: 400px; /* Ajuste o tamanho máximo conforme necessário */
+    height: auto;     /* Mantém a proporção da imagem */
+    display: block;   /* Para permitir margin auto funcionar para centralizar se não usar text-center no pai */
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1rem; /* Espaçamento abaixo do logo */
+}
+
+/* Estilo para o rodapé */
+footer.fixed-bottom {
+    background-color: #193650; /* Um cinza um pouco mais escuro que o 'bg-light' padrão, mas ainda claro. (Bootstrap 'secondary-bg-subtle') */
+    /* Outras opções de cores para o background-color do footer: */
+    /* background-color: #CFD8DC; */  /* Um cinza azulado claro */
+    /* background-color: #B2DFDB; */  /* Um verde água pastel claro */
+    /* background-color: #FFE0B2; */  /* Um pêssego pastel claro */
+    /* background-color: #6c757d; */ /* Cinza escuro (Bootstrap 'secondary'), exigiria texto claro: color: #fff; */
+
+    color: #ffffff; /* Cor do texto escura (Bootstrap 'dark') para bom contraste com fundos claros */
+    
+    /* A classe 'border-top' já adiciona uma borda. Se quiser customizar: */
+    /* border-top: 1px solid #ced4da; */ /* Cor da borda um pouco mais suave */
+}
+
+/* Se você escolhesse um fundo escuro para o footer, o texto precisaria ser claro: */
+/*
+footer.fixed-bottom {
+    background-color: #343a40; // Bootstrap 'dark'
+    color: #f8f9fa; // Bootstrap 'light'
+    border-top: 1px solid #495057;
+}
+footer.fixed-bottom #dbStatusIcon { // Se o ícone for SVG e precisar mudar de cor
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(200%) contrast(100%); // Para ícone SVG preto ficar branco
+}
+*/
+
+/* Garante que os spans dentro do footer também herdem a cor ou tenham uma cor específica */
+footer.fixed-bottom span {
+    color: inherit; /* Herda a cor definida no footer.fixed-bottom */
+}
+
+#dbStatusIcon {
+    vertical-align: middle;
+    margin-left: 5px;
+}

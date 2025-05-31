@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';">
+    <title>VoltDesk</title>
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="body-home"> <div class="container mt-4 text-center">
+
+        <div class="mb-4">
+            <img src="../assets/icons/Logo-VoltDesk.png" alt="Logo do Aplicativo" id="appLogo" class="app-logo-principal">
+        </div>
+
+        <div class="text-center mb-4">
+            <h1>Bem-vindo ao VoltDesk</h1>
+            
+        </div>
+
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-4 mb-3">
+                <div class="card text-center h-100 shadow-sm custom-card card-clientes-pastel" id="goToCadastroCliente">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <img src="../assets/icons/person-plus.png" alt="Cadastro de Clientes" width="80" height="80" class="mb-3">
+                        <h5 class="card-title">Cadastro de Clientes</h5>
+                        <p class="card-text">Gerenciar informações dos seus clientes.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-center h-100 shadow-sm custom-card card-os-pastel" id="goToOS">
+                     <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <img src="../assets/icons/file-earmark-text.png" alt="Ordens de Serviço" width="80" height="80" class="mb-3">
+                        <h5 class="card-title">Ordens de Serviço</h5>
+                        <p class="card-text">Criar e gerenciar ordens de serviço.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="fixed-bottom p-2 border-top"> <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            Data: <span id="currentDate"></span>
+        </div>
+        <div>
+            Status DB: <img id="dbStatusIcon" src="../assets/icons/database-slash.png" alt="DB Status" width="20" height="20">
+            <span id="dbStatusText">Desconectado</span>
+        </div>
+    </div>
+</footer>
+
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/renderer_index.js"></script>
+</body>
+</html>
