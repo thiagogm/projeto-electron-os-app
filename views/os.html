@@ -2,46 +2,177 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';">
-    <title>Ordens de Serviço</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://viacep.com.br; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net;">
+    <title>Ordens de Serviço - Sistema OS</title>
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+<body class="body-form-page">
+
+    <header class="page-header sticky-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#" id="goHome">Sistema OS</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="#" id="goHomeNav">Início</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="goToClientesPage">Cadastro de Clientes</a></li>
-                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Ordens de Serviço</a></li>
-                </ul>
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2 class="page-title">Gerenciamento de Ordens de Serviço</h2>
+                </div>
+                <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                    <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goHomeNav">
+                        <i class="bi bi-house-door"></i> Início
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goToClientesPage">
+                        <i class="bi bi-people"></i> Cadastro de Clientes
+                    </button>
+                    <button type="button" class="btn btn-primary nav-btn-header" id="goToOsPage" disabled>
+                        <i class="bi bi-file-earmark-text"></i> Ordens de Serviço
+                    </button>
+                </div>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <div class="container">
-        <h2>Gerenciamento de Ordens de Serviço</h2>
-        <hr>
-
-        <form id="osForm" class="mb-4">
+    <main class="container-fluid form-container-main os-page-container">
+        
+        <form id="osForm" class="mb-4 needs-validation" novalidate>
             <input type="hidden" id="osId">
             <input type="hidden" id="selectedClientId">
 
-            <div class="row">
-                <div class="col-md-2 mb-3">
-                    <label for="osNumber" class="form-label">Nº OS</label>
-                    <input type="text" class="form-control" id="osNumber" readonly>
+            <div class="row section-divider">
+                <div class="col-lg-7 border-end-lg pe-lg-4">
+                    <fieldset class="form-section mb-3">
+                        <legend class="form-section-legend">Informações da OS</legend>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="osNumber" class="form-label">Nº OS</label>
+                                <input type="text" class="form-control" id="osNumber" readonly>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="entryDate" class="form-label">Data de Entrada</label>
+                                <input type="text" class="form-control" id="entryDate" readonly>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="statusOs" class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" id="statusOs" required>
+                                    <option value="Aberta" selected>Aberta</option>
+                                    <option value="Em Análise">Em Análise</option>
+                                    <option value="Aguardando Aprovação">Aguardando Aprovação</option>
+                                    <option value="Aguardando Peças">Aguardando Peças</option>
+                                    <option value="Em Reparo">Em Reparo</option>
+                                    <option value="Finalizada">Finalizada</option>
+                                    <option value="Cancelada">Cancelada</option>
+                                    <option value="Entregue">Entregue</option>
+                                </select>
+                                <div class="invalid-feedback">Selecione um status.</div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-section mb-3">
+                        <legend class="form-section-legend">Cliente</legend>
+                        <div class="row">
+                            <div class="col-md-7 mb-3">
+                                <label for="searchClientInput" class="form-label">Buscar Cliente (Nome/CPF) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="searchClientInput" placeholder="Digite para buscar..." required>
+                                <div id="clientSearchResults" class="list-group mt-1 search-results-absolute" style="max-height: 150px; overflow-y: auto;"></div>
+                                <div class="invalid-feedback">É necessário selecionar um cliente.</div>
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label">Cliente Selecionado</label>
+                                <div id="selectedClientInfo" class="form-control-plaintext p-2 border rounded" style="min-height: 58px; background-color: #f8f9fa;">
+                                    Nenhum cliente selecionado.
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-section mb-3">
+                        <legend class="form-section-legend">Equipamento e Defeito</legend>
+                        <div class="mb-3">
+                            <label for="equipment" class="form-label">Equipamento (Marca, Modelo, S/N) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="equipment" required>
+                            <div class="invalid-feedback">Descreva o equipamento.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="accessories" class="form-label">Acessórios Deixados</label>
+                            <input type="text" class="form-control" id="accessories" placeholder="Ex: Fonte, cabo, mouse...">
+                        </div>
+                        <div class="mb-3">
+                            <label for="reportedIssue" class="form-label">Defeito Relatado <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="reportedIssue" rows="3" required></textarea>
+                            <div class="invalid-feedback">Descreva o defeito relatado.</div>
+                        </div>
+                    </fieldset>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="entryDate" class="form-label">Data de Entrada</label>
-                    <input type="text" class="form-control" id="entryDate" readonly>
+
+                <div class="col-lg-5 ps-lg-4">
+                    <fieldset class="form-section mb-3">
+                        <legend class="form-section-legend">Diagnóstico e Serviço</legend>
+                        <div class="mb-3">
+                            <label for="technicianNotes" class="form-label">Observações Técnicas / Diagnóstico</label>
+                            <textarea class="form-control" id="technicianNotes" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="servicePerformed" class="form-label">Serviço Realizado</label>
+                            <textarea class="form-control" id="servicePerformed" rows="3"></textarea>
+                        </div>
+                    </fieldset>
+            
+                    <fieldset class="form-section mb-3">
+                        <legend class="form-section-legend">Peças e Custos</legend>
+                        <div id="partsContainer" class="mb-2">
+                            </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary mb-3" id="addPartButton">
+                            <i class="bi bi-plus-circle"></i> Adicionar Peça
+                        </button>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="laborCost" class="form-label">Mão de Obra (R$)</label>
+                                <input type="number" step="0.01" min="0" class="form-control cost-input" id="laborCost" value="0.00">
+                                <div class="invalid-feedback">Valor inválido.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="otherCosts" class="form-label">Outros Custos (R$)</label>
+                                <input type="number" step="0.01" min="0" class="form-control cost-input" id="otherCosts" value="0.00">
+                                 <div class="invalid-feedback">Valor inválido.</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="totalCost" class="form-label">Custo Total (R$)</label>
+                            <input type="text" class="form-control form-control-lg" id="totalCost" value="0.00" readonly style="font-weight: bold; font-size: 1.2rem;">
+                        </div>
+                    </fieldset>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="statusOs" class="form-label">Status*</label>
-                    <select class="form-select" id="statusOs" required>
-                        <option value="Aberta" selected>Aberta</option>
+            </div>
+
+            <div id="osFormFeedbackGlobal" class="alert d-none mt-3" role="alert"></div>
+            <div class="form-actions text-center mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-success btn-lg me-2" id="saveOsButton">
+                    <i class="bi bi-check-lg"></i> Salvar OS
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-lg me-2" id="clearOsFormButton">
+                    <i class="bi bi-eraser"></i> Nova / Limpar
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-lg d-none" id="deleteOsButton">
+                    <i class="bi bi-trash"></i> Excluir OS
+                </button>
+            </div>
+        </form>
+        <hr class="my-5">
+
+        <div class="os-list-section">
+            <h3 class="mb-3">Ordens de Serviço Cadastradas</h3>
+            <div class="row mb-3 align-items-end">
+                 <div class="col-md-4">
+                    <label for="searchOsInput" class="form-label">Buscar OS (Nº, Cliente, Equip.)</label>
+                    <input type="text" class="form-control" id="searchOsInput" placeholder="Digite para buscar...">
+                </div>
+                <div class="col-md-3">
+                    <label for="filterStatus" class="form-label">Filtrar por Status</label>
+                    <select id="filterStatus" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="Aberta">Aberta</option>
                         <option value="Em Análise">Em Análise</option>
                         <option value="Aguardando Aprovação">Aguardando Aprovação</option>
                         <option value="Aguardando Peças">Aguardando Peças</option>
@@ -51,132 +182,71 @@
                         <option value="Entregue">Entregue</option>
                     </select>
                 </div>
+                <div class="col-md-2">
+                    <label for="osPerPageSelect" class="form-label">Itens por pág.</label>
+                    <select id="osPerPageSelect" class="form-select">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-primary w-100" id="applyOsFiltersButton">
+                        <i class="bi bi-funnel"></i> Aplicar Filtros / Buscar
+                    </button>
+                </div>
             </div>
-
-            <fieldset class="border p-3 mb-3">
-                <legend class="w-auto px-2 h6">Cliente</legend>
-                <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <label for="searchClientInput" class="form-label">Buscar Cliente (Nome/CPF)</label>
-                        <input type="text" class="form-control" id="searchClientInput" placeholder="Digite para buscar o cliente...">
-                        <div id="clientSearchResults" class="list-group mt-1" style="max-height: 150px; overflow-y: auto; position: absolute; z-index: 1000; width: calc(100% - 30px);"></div>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">Cliente Selecionado</label>
-                        <div id="selectedClientInfo" class="form-control" style="min-height: 38px; background-color: #e9ecef;">
-                            Nenhum cliente selecionado.
-                        </div>
-                    </div>
-                </div>
-            </fieldset>
-
-            <fieldset class="border p-3 mb-3">
-                <legend class="w-auto px-2 h6">Equipamento e Defeito</legend>
-                <div class="mb-3">
-                    <label for="equipment" class="form-label">Equipamento (Marca, Modelo, S/N)*</label>
-                    <input type="text" class="form-control" id="equipment" required>
-                </div>
-                <div class="mb-3">
-                    <label for="reportedIssue" class="form-label">Defeito Relatado pelo Cliente*</label>
-                    <textarea class="form-control" id="reportedIssue" rows="3" required></textarea>
-                </div>
-                 <div class="mb-3">
-                    <label for="accessories" class="form-label">Acessórios Deixados</label>
-                    <input type="text" class="form-control" id="accessories" placeholder="Ex: Fonte, cabo, mouse...">
-                </div>
-            </fieldset>
-
-            <fieldset class="border p-3 mb-3">
-                <legend class="w-auto px-2 h6">Diagnóstico e Serviço</legend>
-                <div class="mb-3">
-                    <label for="technicianNotes" class="form-label">Observações Técnicas / Diagnóstico</label>
-                    <textarea class="form-control" id="technicianNotes" rows="3"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="servicePerformed" class="form-label">Serviço Realizado</label>
-                    <textarea class="form-control" id="servicePerformed" rows="3"></textarea>
-                </div>
-            </fieldset>
-            
-            <fieldset class="border p-3 mb-3">
-                <legend class="w-auto px-2 h6">Peças e Custos</legend>
-                <div id="partsContainer">
-                    </div>
-                <button type="button" class="btn btn-sm btn-outline-primary mb-2" id="addPartButton">Adicionar Peça</button>
-                
-                <div class="row mt-2">
-                    <div class="col-md-4 mb-3">
-                        <label for="laborCost" class="form-label">Custo Mão de Obra (R$)</label>
-                        <input type="number" step="0.01" class="form-control cost-input" id="laborCost" value="0.00">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="otherCosts" class="form-label">Outros Custos (R$)</label>
-                        <input type="number" step="0.01" class="form-control cost-input" id="otherCosts" value="0.00">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="totalCost" class="form-label">Custo Total (R$)</label>
-                        <input type="text" class="form-control" id="totalCost" value="0.00" readonly style="font-weight: bold;">
-                    </div>
-                </div>
-            </fieldset>
-
-            <div id="osFormFeedback" class="alert d-none" role="alert"></div>
-
-            <div class="d-flex justify-content-end">
-                <button type="button" class="btn btn-secondary me-2" id="clearOsFormButton">Limpar / Nova OS</button>
-                <button type="button" class="btn btn-danger me-2 d-none" id="deleteOsButton">Excluir OS</button>
-                <button type="submit" class="btn btn-success" id="saveOsButton">Salvar OS</button>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nº OS</th>
+                            <th>Cliente</th>
+                            <th>Equipamento</th>
+                            <th>Data Entrada</th>
+                            <th>Status</th>
+                            <th>Total (R$)</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="osTableBody">
+                        </tbody>
+                </table>
             </div>
-        </form>
-        <hr>
-
-        <h4>Ordens de Serviço Cadastradas</h4>
-        <div class="row mb-3">
-             <div class="col-md-4">
-                <label for="filterStatus" class="form-label">Filtrar por Status</label>
-                <select id="filterStatus" class="form-select">
-                    <option value="">Todos</option>
-                    <option value="Aberta">Aberta</option>
-                    <option value="Em Análise">Em Análise</option>
-                    <option value="Aguardando Aprovação">Aguardando Aprovação</option>
-                    <option value="Aguardando Peças">Aguardando Peças</option>
-                    <option value="Em Reparo">Em Reparo</option>
-                    <option value="Finalizada">Finalizada</option>
-                    <option value="Cancelada">Cancelada</option>
-                    <option value="Entregue">Entregue</option>
-                </select>
-            </div>
-            <div class="col-md-8">
-                 <label for="searchOsInput" class="form-label">Buscar OS (Nº, Cliente, Equipamento)</label>
-                 <input type="text" class="form-control" id="searchOsInput" placeholder="Digite para buscar...">
-            </div>
+            <nav aria-label="Paginação da Lista de OS">
+                <ul class="pagination justify-content-center mt-3" id="osPaginationControls">
+                    </ul>
+            </nav>
         </div>
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>Nº OS</th>
-                        <th>Cliente</th>
-                        <th>Equipamento</th>
-                        <th>Data Entrada</th>
-                        <th>Status</th>
-                        <th>Total (R$)</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="osTableBody">
-                    </tbody>
-            </table>
-        </div>
-    </div>
+    </main>
 
-    <footer class="fixed-bottom bg-light text-dark p-2 border-top">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div>Data: <span id="currentDate"></span></div>
-            <div>Status DB: <img id="dbStatusIcon" src="../assets/icons/database-slash.svg" alt="DB Status" width="20" height="20"> <span id="dbStatusText">Desconectado</span></div>
+   <footer class="app-footer fixed-bottom py-2 mt-4 small">
+        <div class="container-fluid px-md-4 d-flex justify-content-between align-items-center">
+            <div id="copyrightText">
+                &copy; <span id="currentYear"></span> VoltDesk. Todos os direitos reservados.
+            </div>
+            <div class="d-flex align-items-center">
+                <span id="currentDateTime" class="me-3"></span>
+                <span>Status DB:</span> 
+                <i data-feather="database" id="dbStatusIcon" class="align-middle ms-1 me-1"></i>
+                <span id="dbStatusText">Desconectado</span>
+            </div>
         </div>
     </footer>
 
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100"></div>
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title" id="confirmationModalLabel">Confirmação</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button></div>
+        <div class="modal-body" id="confirmationModalBody">Você tem certeza?</div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirmationModalCancel">Cancelar</button><button type="button" class="btn btn-primary" id="confirmationModalConfirm">Confirmar</button></div>
+      </div></div>
+    </div>
+
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/cpf_validator.js"></script>
+    <script src="../assets/js/email_validator.js"></script>
     <script src="../assets/js/renderer_os.js"></script>
 </body>
 </html>

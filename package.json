@@ -4,20 +4,22 @@
     "description": "Aplicativo de Cadastro de Clientes e OS para Eletricistas",
     "main": "main.js",
     "scripts": {
-      "start": "electron .",
-      "test": "echo \"Error: no test specified\" && exit 1"
+        "start": "electron .",
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [
-      "Electron",
-      "OS",
-      "Clientes"
+        "Electron",
+        "OS",
+        "Clientes"
     ],
     "author": "Seu Nome",
     "license": "ISC",
     "devDependencies": {
-      "electron": "^28.0.0"  
+        "electron": "^28.3.3"
     },
     "dependencies": {
-      "mongodb": "^6.3.0"  
+        "mongodb": "^6.3.0",
+        "mongoose": "^8.15.1",
+        "node-fetch": "^3.3.2"
     }
-  }
+}

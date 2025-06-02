@@ -1,0 +1,130 @@
+/* assets/css/index.css - Estilos específicos para a página inicial moderna */
+
+body.body-home {
+background-color: \#f4f7f9;
+color: \#4a5568;
+padding-bottom: 50px; /* Espaço para o footer fixo */
+display: flex;
+flex-direction: column;
+min-height: 100vh;
+}
+
+/\* Seção Hero (Boas-vindas) */
+.hero-section {
+padding: 1.5rem 0; /* Padding vertical reduzido */
+}
+
+.app-logo-main {
+max-width: 130px; /* Logo principal um pouco menor */
+height: auto;
+margin-bottom: 1rem;
+}
+
+.hero-section .display-5 {
+color: \#2c3e50;
+margin-bottom: 0.5rem; /\* Menos espaço abaixo do título */
+font-size: 2.25rem; /* Tamanho do display-5 um pouco menor se necessário */
+}
+
+.hero-section .lead {
+font-size: 1.1rem;
+color: \#5a6878;
+margin-bottom: 1.5rem; /* Menos espaço abaixo do lead */
+}
+
+/*Cards Interativos na Index */
+.custom-card-index {
+background-color: \#ffffff;
+border: 1px solid \#e2e8f0;
+border-radius: 0.6rem; /* Bordas um pouco menos arredondadas \*/
+transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+overflow: hidden;
+display: flex;
+flex-direction: column;
+text-decoration: none;
+}
+
+.custom-card-index:hover {
+transform: translateY(-4px) scale(1.01); /\* Efeito hover mais sutil \*/
+box-shadow: 0 0.6rem 1.2rem rgba(44, 62, 80, 0.1), 0 0.2rem 0.4rem rgba(44,62,80,0.07) !important;
+}
+
+.card-accent-primary {
+border-left: 4px solid var(--bs-primary);
+}
+
+.card-accent-success {
+border-left: 4px solid var(--bs-success);
+}
+
+.icon-circle {
+width: 60px; /\* Círculo do ícone menor */
+height: 60px;
+border-radius: 50%;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+margin-bottom: 0.75rem; /* Menos espaço abaixo do círculo \*/
+}
+
+.bg-primary-soft {
+background-color: \#e7f3ff;
+}
+.text-primary {
+color: \#007bff \!important;
+}
+
+.bg-success-soft {
+background-color: \#eaf6ec;
+}
+.text-success {
+color: \#28a745 \!important;
+}
+
+/\* Ícones dentro dos cards (eram .icon-xxl, agora .icon-xl no HTML) */
+.icon-xl {
+width: 28px; /* Ícones principais nos cards menores \*/
+height: 28px;
+stroke-width: 2;
+}
+
+.custom-card-index .card-body {
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+flex-grow: 1;
+text-align: center;
+padding: 1rem; /\* Padding interno do card reduzido (era p-3 no HTML, pode ser controlado aqui) \*/
+}
+
+.custom-card-index .card-title { /\* Agora é h5 no HTML */
+color: \#343a40;
+margin-bottom: 0.5rem;
+font-size: 1.15rem; /* Tamanho da fonte do título do card */
+}
+.custom-card-index .card-text { /* Agora tem .small no HTML */
+font-size: 0.875rem; /* Reforça o tamanho pequeno */
+margin-bottom: 1rem;
+line-height: 1.4; /* Altura da linha para o texto pequeno \*/
+}
+
+.custom-card-index .btn { /\* Botão tamanho padrão */
+font-weight: 500;
+padding: 0.5rem 1rem; /* Padding do botão padrão */
+margin-top: auto;
+width: auto;
+align-self: center;
+font-size: 0.9rem; /* Fonte do botão um pouco menor \*/
+}
+.custom-card-index .btn i[data-feather].icon-sm-btn {
+width: 16px;
+height: 16px;
+vertical-align: middle;
+stroke-width: 2.5;
+margin-left: 0.25rem;
+}
+
+body.body-home \> main.container {
+flex-grow: 1;
+}

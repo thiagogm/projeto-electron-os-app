@@ -3,56 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';">
-    <title>VoltDesk</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://viacep.com.br; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net;">
+    <title>VoltDesk - Início</title>
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body class="body-home"> <div class="container mt-4 text-center">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css"> <link rel="stylesheet" href="../assets/css/index.css"> </head>
+<body class="body-home">
 
-        <div class="mb-4">
-            <img src="../assets/icons/Logo-VoltDesk.png" alt="Logo do Aplicativo" id="appLogo" class="app-logo-principal">
+    <main class="container mt-4 pt-3 text-center"> 
+        <div class="hero-section mb-4"> 
+            <img src="../assets/icons/Logo-VoltDesk.png" alt="Logo Principal VoltDesk" id="appLogo" class="app-logo-main mb-3"> 
+            <h1 class="display-5 fw-bold text-primary mb-2">Bem-vindo ao VoltDesk</h1> 
+            <p class="lead text-secondary col-lg-9 mx-auto mb-4"> 
+                Sua solução completa e intuitiva para gerenciamento de clientes e ordens de serviço.
+            </p>
         </div>
 
-        <div class="text-center mb-4">
-            <h1>Bem-vindo ao VoltDesk</h1>
-            
-        </div>
-
-        <div class="row justify-content-center mt-5">
-            <div class="col-md-4 mb-3">
-                <div class="card text-center h-100 shadow-sm custom-card card-clientes-pastel" id="goToCadastroCliente">
-                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                        <img src="../assets/icons/person-plus.png" alt="Cadastro de Clientes" width="80" height="80" class="mb-3">
-                        <h5 class="card-title">Cadastro de Clientes</h5>
-                        <p class="card-text">Gerenciar informações dos seus clientes.</p>
+        <div class="row justify-content-center gx-lg-4 gy-3"> 
+            <div class="col-lg-4 col-md-5"> 
+                <div class="card h-100 shadow-sm custom-card-index card-accent-primary interactive-card" id="goToCadastroCliente">
+                    <div class="card-body p-3 d-flex flex-column align-items-center"> 
+                        <div class="icon-circle bg-primary-soft text-primary mb-3"> 
+                            <i data-feather="users" class="icon-xl"></i> 
+                        </div>
+                        <h5 class="card-title h5 fw-bold mb-2">Cadastro de Clientes</h5> 
+                        <p class="card-text text-muted small mb-3 flex-grow-1">Gerencie informações dos seus clientes de forma organizada.</p> 
+                        <div class="d-grid w-100">
+                            <button class="btn btn-primary"> 
+                                Acessar Clientes <i data-feather="arrow-right-circle" class="ms-1 icon-sm-btn"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
-                <div class="card text-center h-100 shadow-sm custom-card card-os-pastel" id="goToOS">
-                     <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                        <img src="../assets/icons/file-earmark-text.png" alt="Ordens de Serviço" width="80" height="80" class="mb-3">
-                        <h5 class="card-title">Ordens de Serviço</h5>
-                        <p class="card-text">Criar e gerenciar ordens de serviço.</p>
+            <div class="col-lg-4 col-md-5"> 
+                <div class="card h-100 shadow-sm custom-card-index card-accent-success interactive-card" id="goToOS">
+                    <div class="card-body p-3 d-flex flex-column align-items-center">
+                        <div class="icon-circle bg-success-soft text-success mb-3"> 
+                            <i data-feather="file-text" class="icon-xl"></i> 
+                        </div>
+                        <h5 class="card-title h5 fw-bold mb-2">Ordens de Serviço</h5> 
+                        <p class="card-text text-muted small mb-3 flex-grow-1">Crie, acompanhe e finalize ordens de serviço de maneira prática.</p> 
+                        <div class="d-grid w-100">
+                            <button class="btn btn-success">
+                                Gerenciar OS <i data-feather="arrow-right-circle" class="ms-1 icon-sm-btn"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <footer class="fixed-bottom p-2 border-top"> <div class="container d-flex justify-content-between align-items-center">
-        <div>
-            Data: <span id="currentDate"></span>
+<footer class="app-footer fixed-bottom py-2 mt-4 small">
+        <div class="container-fluid px-md-4 d-flex justify-content-between align-items-center">
+            <div id="copyrightText">
+                &copy; <span id="currentYear"></span> VoltDesk. Todos os direitos reservados.
+            </div>
+            <div class="d-flex align-items-center">
+                <span id="currentDateTime" class="me-3"></span>
+                <span>Status DB:</span> 
+                <i data-feather="database" id="dbStatusIcon" class="align-middle ms-1 me-1"></i>
+                <span id="dbStatusText">Desconectado</span>
+            </div>
         </div>
-        <div>
-            Status DB: <img id="dbStatusIcon" src="../assets/icons/database-slash.png" alt="DB Status" width="20" height="20">
-            <span id="dbStatusText">Desconectado</span>
-        </div>
-    </div>
-</footer>
+    </footer>
 
     <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
     <script src="../assets/js/renderer_index.js"></script>
 </body>
 </html>

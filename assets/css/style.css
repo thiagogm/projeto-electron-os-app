@@ -1,128 +1,330 @@
 /* assets/css/style.css */
 
+/* Estilos Globais e do Body (ajustados a partir do seu CSS) */
 body {
-    font-family: sans-serif;
-    padding-bottom: 60px; /* Para não sobrepor o footer */
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #1e293b; /* slate-700 - Cor principal do texto */
+    font-size: 1rem; 
+    margin: 0;
+    padding-top: 90px; /* Espaço para o cabeçalho fixo */
+    padding-bottom: 70px; /* Espaço para o rodapé fixo */
+    -webkit-font-smoothing: antialiased; /* Melhora a renderização da fonte */
+    -moz-osx-font-smoothing: grayscale;  /* Melhora a renderização da fonte */
 }
 
-/* Nova cor de fundo para a home page (ou body em geral) */
-.body-home {
-    background-color: #86b8f8; /* Um cinza bem claro (Bootstrap 'light' color) */
-    /* Outras opções:
-       background-color: #eef1f5; (um azul acinzentado bem claro)
-       background-color: #f4f7f6; (um verde acinzentado bem claro)
-    */
+/* Se você quiser um fundo específico apenas para a home, pode manter ou ajustar .body-home */
+.body-home { 
+    background-color: #e0e7ef; /* Manteve o que você tinha, ajuste se quiser diferente das form pages */
+    padding-top: 0; 
 }
 
-.custom-card {
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.1s ease; /* Adicionada transição para background-color */
-    border: none; /* Remove a borda padrão do card para um visual mais suave */
+/* Cabeçalho da Página */
+.page-header {
+    background-color: #ffffff; /* Branco, para contrastar com o novo fundo do body */
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    z-index: 1030; 
 }
 
-.custom-card:hover {
-    transform: translateY(-7px); /* Aumenta um pouco o efeito de elevação */
-    box-shadow: 0 0.75rem 1.5rem rgba(0,0,0,.18)!important; /* Sombra um pouco mais pronunciada */
+.page-title {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0;
+    font-size: 1.75rem;
 }
 
-/* Estilo para o logo na tela principal */
-.app-logo-principal {
-    max-width: 180px; /* Pode ajustar conforme seu logo */
-    height: auto;
-    display: block;
+.nav-btn-header {
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+.nav-btn-header i {
+    margin-right: 0.35rem;
+}
+
+.search-results-absolute {
+    position: absolute;
+    width: calc(100% - 3rem); /* Ajustar com base no padding do .page-header .container-fluid */
+    left: 1.5rem;
+    z-index: 1000; /* Abaixo do header, acima do conteúdo */
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 0.25rem 0.25rem;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+}
+
+/* Contêiner Principal do Formulário */
+.form-container-main {
+    background-color: #ffffff; /* Branco, para se destacar do fundo do body mais escuro */
+    padding: 2rem 2.5rem; 
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(30,41,59,0.08), 0 3px 10px rgba(100,116,139,0.06);
+    margin-top: 2rem; 
+    margin-bottom: 2rem;
+    max-width: 1400px; 
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 1.5rem; /* Um pouco mais de espaço abaixo do logo */
 }
 
-/* Cores pastéis para os cards */
-.card-clientes-pastel {
-    background-color: #48abb8; /* Azul pastel bem clarinho (tipo 'Light Cyan') */
-    /* Outra opção: background-color: #d1e7fd; (Bootstrap 'info-bg-subtle') */
+.text-instructions {
+    color: #475569; /* slate-600 */
+    font-size: 0.95rem;
 }
 
-.card-clientes-pastel:hover {
-    background-color: #b3e5fc; /* Um tom um pouco mais escuro do azul pastel no hover */
+/* Seções do Formulário (Fieldset) */
+.form-section {
+    border: 1px solid #e2e8f0; /* slate-200 */
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    background-color: #f8fafc; /* slate-50, fundo levemente diferente para a seção */
 }
 
-.card-os-pastel {
-    background-color: #42da51d0; /* Verde pastel bem clarinho (tipo 'Light Green') */
-    /* Outra opção: background-color: #d1f2eb; (Bootstrap 'success-bg-subtle') */
+.form-section-legend {
+    font-weight: 600;
+    color: #334155; /* slate-700 */
+    font-size: 1.1rem;
+    padding: 0 0.75rem;
+    width: auto; /* Para o legend não ocupar toda a largura */
+    margin-bottom: 1rem; /* Espaçamento após o legend */
 }
 
-.card-os-pastel:hover {
-    background-color: #c8e6c9; /* Um tom um pouco mais escuro do verde pastel no hover */
+/* Estilos para Controles de Formulário (adaptado do seu CSS) */
+.form-label {
+    font-weight: 600;
+    color: #1e293b; /* slate-800 */
+    margin-bottom: 0.35rem;
+    font-size: 0.9rem;
 }
 
-/* Ajustar a cor do texto dentro dos cards pastéis se necessário para contraste */
-.card-clientes-pastel .card-title,
-.card-clientes-pastel .card-text,
-.card-os-pastel .card-title,
-.card-os-pastel .card-text {
-    color: #333; /* Garante que o texto seja escuro o suficiente */
+.form-control,
+.form-select { /* Adicionado .form-select */
+    background-color: #ffffff;
+    color: #334155; /* slate-700 */
+    border: 1px solid #cbd5e1; /* slate-300 */
+    border-radius: 6px;
+    /* box-shadow: 0 1px 2px rgba(0,0,0,0.05); */ /* Sombra sutil */
+    font-size: 1rem;
+    padding: 0.5rem 0.85rem; /* Padding ajustado */
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    width: 100%; /* Ocupa a coluna do grid */
+    max-width: none; /* Remove o max-width fixo que você tinha */
+}
+textarea.form-control {
+    min-height: calc(1.5em + 1rem + 2px); /* Altura mínima padrão */
 }
 
-/* Estilo para campo de CPF inválido/duplicado */
-.is-invalid-cpf {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+.form-control:focus,
+.form-select:focus {
+    background-color: #ffffff;
+    color: #0f172a; /* slate-900 */
+    border-color: #3b82f6; /* blue-500 */
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+    outline: 0;
 }
 
-#dbStatusIcon {
+/* Validação (adaptado do seu CSS) */
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: #10b981 !important; /* green-500 */
+    /* background-image para ícone de check pode ser adicionado aqui */
+}
+.form-control.is-valid:focus,
+.form-select.is-valid:focus {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25);
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #ef4444 !important; /* red-500 */
+    /* background-image para ícone de erro pode ser adicionado aqui */
+}
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.25);
+}
+
+.invalid-feedback {
+    font-size: 0.875em;
+    color: #dc3545; /* Bootstrap default danger color */
+    margin-top: 0.25rem;
+}
+
+/* Botão de busca de CEP */
+#cepSearchButton {
+    border-left: none; /* Remove borda dupla */
+}
+#cepSearchButton:hover {
+    background-color: #e9ecef;
+}
+
+/* Botões de Ação do Formulário */
+.form-actions {
+    border-top: 1px solid #e2e8f0; /* slate-200 */
+    margin-top: 2rem; /* Espaço antes dos botões */
+    padding-top: 1.5rem;
+}
+
+.form-actions .btn-lg {
+    padding: 0.65rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+}
+.form-actions .btn-lg i {
+    margin-right: 0.5rem;
+}
+
+/* Rodapé (mantendo seu estilo, apenas ajustando se necessário) */
+.app-footer {
+    background-color: #343a40; /* Bootstrap dark - um cinza bem escuro */
+    color: #adb5bd; /* Texto base cinza claro para contraste */
+    border-top: 1px solid #495057; /* Borda sutil um pouco mais clara */
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+    font-size: 0.875em;
+}
+
+/* Garante que spans dentro do footer herdem a cor ou tenham a cor base clara */
+.app-footer span {
+    color: inherit; /* Herda #adb5bd */
+}
+
+.app-footer #copyrightText {
+    color: #ced4da; /* Um pouco mais claro para o copyright */
+}
+
+.app-footer #dbStatusIcon {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2.5;
+    vertical-align: text-bottom;
+    /* A cor será definida pelas classes de status */
+}
+
+/* Cores para o ícone e texto de status do DB (CONTRASTE COM FUNDO ESCURO) */
+.icon-status-db-disconnected,
+.app-footer .text-status-disconnected {
+    color: #ff8080 !important; /* Vermelho claro e vibrante */
+}
+
+.icon-status-db-connected,
+.app-footer .text-status-connected {
+    color: #50e3c2 !important; /* Verde/Turquesa claro e vibrante */
+}
+
+.app-footer .text-status-verifying {
+    color: #f1c40f !important; /* Amarelo/Laranja para "Verificando..." */
+}
+
+/* Se o texto "Conectado", "Desconectado" precisar de mais peso */
+.app-footer #dbStatusText {
+    font-weight: 500; 
+}
+
+
+
+
+/* Ajustes para responsividade (se necessário, além do grid do Bootstrap) */
+@media (max-width: 992px) { /* Telas médias e abaixo */
+    .page-header {
+        padding: 0.75rem 1rem;
+    }
+    .page-title {
+        font-size: 1.5rem;
+        text-align: center;
+        margin-bottom: 0.75rem;
+    }
+    .page-header .col-md-4 { /* Colunas do header em telas menores */
+        text-align: center !important; /* Centraliza tudo */
+    }
+     .page-header .input-group {
+        margin-bottom: 0.5rem;
+    }
+    .form-container-main {
+        padding: 1.5rem 1rem;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding-top: 150px; /* Mais espaço para header que pode quebrar em mais linhas */
+    }
+     .form-actions .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    .form-actions .btn-lg.me-2 {
+        margin-right: 0 !important;
+    }
+}
+
+/* assets/css/style.css */
+
+/* ... (Estilos globais, .page-header, .form-container-main, .form-section, etc. já existentes) ... */
+
+/* Específico para a página de OS, se necessário um container ligeiramente diferente */
+.os-page-container {
+    /* max-width: 1600px; /* Pode ser um pouco maior que o de clientes devido à complexidade */
+}
+
+/* Divisor de colunas no formulário de OS */
+.section-divider .border-end-lg {
+    border-right: 1px solid #dee2e6 !important; /* Garante a visibilidade da borda */
+}
+@media (max-width: 991.98px) { /* Abaixo de LG */
+    .section-divider .border-end-lg {
+        border-right: none !important;
+        border-bottom: 1px solid #dee2e6 !important; /* Adiciona borda inferior entre as seções no mobile */
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+}
+
+
+/* Estilo para informações do cliente selecionado */
+#selectedClientInfo.form-control-plaintext {
+    background-color: #f8f9fa; /* Um fundo leve para destacar */
+    min-height: 58px; /* Para acomodar duas linhas de texto pequeno */
+}
+
+/* Ajustes para a seção de peças */
+.part-row .form-control-sm {
+    font-size: 0.875rem; /* Torna os campos de peça um pouco menores */
+    padding: 0.25rem 0.5rem;
+}
+.part-row .remove-part-button i {
+    font-size: 0.9rem; /* Ajusta o tamanho do ícone X */
     vertical-align: middle;
-    margin-left: 5px;
 }
 
-.client-list-item {
-    cursor: pointer;
+/* Tabela de OS */
+.os-list-section .table {
+    margin-bottom: 1rem; /* Espaço antes da paginação */
 }
-.client-list-item:hover {
-    background-color: #f8f9fa;
+.os-list-section .table th {
+    background-color: #f8f9fa; /* Fundo leve para o cabeçalho da tabela */
 }
-
-/* Estilo para o logo na tela principal */
-.app-logo-principal {
-    max-width: 400px; /* Ajuste o tamanho máximo conforme necessário */
-    height: auto;     /* Mantém a proporção da imagem */
-    display: block;   /* Para permitir margin auto funcionar para centralizar se não usar text-center no pai */
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 1rem; /* Espaçamento abaixo do logo */
+.os-list-section .table .edit-os-btn i {
+    font-size: 0.95rem; /* Ícone de edição */
+}
+.os-list-section .badge {
+    font-size: 0.8em; /* Tamanho do badge de status */
 }
 
-/* Estilo para o rodapé */
-footer.fixed-bottom {
-    background-color: #193650; /* Um cinza um pouco mais escuro que o 'bg-light' padrão, mas ainda claro. (Bootstrap 'secondary-bg-subtle') */
-    /* Outras opções de cores para o background-color do footer: */
-    /* background-color: #CFD8DC; */  /* Um cinza azulado claro */
-    /* background-color: #B2DFDB; */  /* Um verde água pastel claro */
-    /* background-color: #FFE0B2; */  /* Um pêssego pastel claro */
-    /* background-color: #6c757d; */ /* Cinza escuro (Bootstrap 'secondary'), exigiria texto claro: color: #fff; */
-
-    color: #ffffff; /* Cor do texto escura (Bootstrap 'dark') para bom contraste com fundos claros */
-    
-    /* A classe 'border-top' já adiciona uma borda. Se quiser customizar: */
-    /* border-top: 1px solid #ced4da; */ /* Cor da borda um pouco mais suave */
+/* Controles de Paginação */
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd; /* Cor primária do Bootstrap */
+    border-color: #0d6efd;
+}
+.pagination .page-link {
+    color: #0d6efd;
+}
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
 }
 
-/* Se você escolhesse um fundo escuro para o footer, o texto precisaria ser claro: */
-/*
-footer.fixed-bottom {
-    background-color: #343a40; // Bootstrap 'dark'
-    color: #f8f9fa; // Bootstrap 'light'
-    border-top: 1px solid #495057;
-}
-footer.fixed-bottom #dbStatusIcon { // Se o ícone for SVG e precisar mudar de cor
-    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(200%) contrast(100%); // Para ícone SVG preto ficar branco
-}
-*/
-
-/* Garante que os spans dentro do footer também herdem a cor ou tenham uma cor específica */
-footer.fixed-bottom span {
-    color: inherit; /* Herda a cor definida no footer.fixed-bottom */
-}
-
-#dbStatusIcon {
-    vertical-align: middle;
-    margin-left: 5px;
-}
+/* ... (Resto do seu style.css) ... */

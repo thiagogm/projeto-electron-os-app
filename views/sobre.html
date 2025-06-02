@@ -4,9 +4,144 @@
     <meta charset="UTF-8">
     <title>Sobre</title>
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e293b 0%, #64748b 100%);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .about-card {
+            width: 700px;
+            max-width: 95vw;
+            min-height: 340px;
+            background: #fff;
+            color: #1e293b;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(30,41,59,0.18), 0 1.5px 8px rgba(100,116,139,0.10);
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+        }
+        .about-left {
+            background: linear-gradient(135deg, #3b82f6 0%, #64748b 100%);
+            color: #fff;
+            width: 240px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            box-shadow: 2px 0 12px rgba(59,130,246,0.08);
+        }
+        .logo {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 8px #3b82f6aa);
+            margin-bottom: 1rem;
+        }
+        .about-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+        .about-version {
+            font-size: 0.95rem;
+            color: #bae6fd;
+            font-weight: 600;
+        }
+        .about-subtitle {
+            color: #dbeafe;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        .about-right {
+            flex: 1;
+            padding: 2rem 2rem 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .about-right p {
+            font-size: 1.05rem;
+            color: #334155;
+            margin-bottom: 1rem;
+        }
+        .about-card ul {
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(100,116,139,0.07);
+        }
+        .about-card ul li {
+            color: #334155;
+            margin-bottom: 0.4rem;
+            font-size: 1rem;
+        }
+        .about-footer {
+            color: #64748b;
+            font-size: 0.97rem;
+            margin-top: 0.8rem;
+            letter-spacing: 0.2px;
+            text-align: right;
+        }
+        @media (max-width: 800px) {
+            .about-card {
+                flex-direction: column;
+                width: 98vw;
+            }
+            .about-left {
+                width: 100%;
+                flex-direction: row;
+                justify-content: flex-start;
+                padding: 1rem;
+            }
+            .about-right {
+                padding: 1rem;
+            }
+            .about-footer {
+                text-align: center;
+            }
+        }
+    </style>
 </head>
-<body class="p-3">
-    <h4>App OS v1.0</h4>
-    <p>Desenvolvido com Electron, Node.js e MongoDB.</p>
+<body>
+    <div class="about-card shadow-lg">
+        <div class="about-left">
+            <img src="../assets/icons/Logo-VoltDesk.png" alt="Logo do VoltDesk" class="logo">
+            <div>
+                <div class="about-title">App OS <span class="about-version">v1.0</span></div>
+                <div class="about-subtitle">VoltDesk<br>Gestão de Ordens de Serviço</div>
+            </div>
+        </div>
+        <div class="about-right">
+            <p>
+                O <strong>App OS</strong> é uma solução desktop desenvolvida com <b>Electron</b>, <b>Node.js</b> e <b>MongoDB</b>, criada para otimizar o controle, acompanhamento e histórico de ordens de serviço em pequenas e médias empresas. 
+                Com interface moderna e intuitiva, o App OS centraliza informações, agiliza processos e garante segurança no armazenamento dos dados.
+            </p>
+            <ul>
+                <li><b>Cadastro inteligente</b> de clientes e serviços</li>
+                <li><b>Controle visual</b> de status das ordens</li>
+                <li><b>Relatórios dinâmicos</b> e histórico detalhado</li>
+                <li><b>Interface responsiva</b> e fácil de usar</li>
+                <li><b>Segurança</b> e integridade dos dados</li>
+            </ul>
+            <p>
+                Ideal para equipes que buscam eficiência, organização e praticidade no dia a dia operacional.
+            </p>
+            <div class="about-footer">
+                Desenvolvido por <b>Thiago</b> &copy; 2025 &mdash; <span style="color:#3b82f6;">VoltDesk</span>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
