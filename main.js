@@ -3,8 +3,8 @@ const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron');
 const path = require('path');
 const mongoose = require('mongoose');
 
-const Client = require('./Models/client_schema.js');
-const ServiceOrder = require('./Models/os_schema.js');
+const Client = require('./models/client_schema.js');
+const ServiceOrder = require('./models/os_schema.js');
 const { connectDB, disconnectDB, ObjectId, subscribeToConnectionStatus } = require('./utils/db');
 
 let mainWindow;
