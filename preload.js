@@ -6,7 +6,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     navigateTo: (pageFile) => ipcRenderer.send('navigate-to', pageFile),
 
     // Status do DB
-    onDbStatusUpdate: (callback) => ipcRenderer.on('db-status-updated', (_event, status) => callback(status)),
+    onDbStatusUpdate: (callback) => {
+        const listener = (_event, status) => callback(status);
+        ipcRenderer.on('db-status-updated', listener);
+        return () => ipcRenderer.removeListener('db-status-updated', listener); // Para cleanup
+    },
     getInitialDbStatus: () => ipcRenderer.invoke('get-initial-db-status'),
 
     // Clientes
@@ -16,7 +20,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     updateClient: (clientId, clientData) => ipcRenderer.invoke('update-client', clientId, clientData),
     deleteClient: (clientId) => ipcRenderer.invoke('delete-client', clientId),
     findClientByCpf: (cpf) => ipcRenderer.invoke('find-client-by-cpf', cpf),
-    searchClients: (searchTerm) => ipcRenderer.invoke('search-clients', searchTerm), // Usado na busca rápida
+    searchClients: (searchTerm) => ipcRenderer.invoke('search-clients', searchTerm),
 
     // Ordens de Serviço (OS)
     addOS: (osData) => ipcRenderer.invoke('add-os', osData),
@@ -29,7 +33,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Utilitários
     fetchCep: (cep) => ipcRenderer.invoke('fetch-cep', cep),
 
-    // Configurações (se implementado)
+    // Relatórios PDF
+    triggerGenerateReport: (reportType) => ipcRenderer.send('trigger-generate-report', reportType),
+    onReportGenerated: (callback) => {
+        const listener = (_event, result) => callback(result);
+        ipcRenderer.on('report-generated', listener);
+        return () => ipcRenderer.removeListener('report-generated', listener); // Cleanup
+    },
+    onTriggerGenerateReport: (callback) => ipcRenderer.on('trigger-generate-report', (event, reportType) => callback(reportType)),
+
+    // Ações Gerais do Electron (se chamadas pela UI)
+    quitApp: () => ipcRenderer.send('quit-app-from-ui'),
+    reloadWindow: () => ipcRenderer.send('reload-window-from-ui'),
+    toggleDevTools: () => ipcRenderer.send('toggle-dev-tools-from-ui'),
+    openExternal: (url) => ipcRenderer.send('open-external-from-ui', url),
+
+    // Configurações (quando for implementar futuramente)
     // getSettings: () => ipcRenderer.invoke('get-settings'),
     // saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
+    invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
 });

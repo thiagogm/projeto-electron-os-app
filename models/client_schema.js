@@ -132,3 +132,8 @@ clientSchema.pre('save', function(next) {
 
 // Exportar o MODELO compilado pelo Mongoose.
 module.exports = mongoose.model('Client', clientSchema);
+
+// Filtro para encontrar clientes que estão com status finalizado ou entregue
+const filtroClientes = { status: { $in: ['Finalizada', 'Entregue'] } };
+
+

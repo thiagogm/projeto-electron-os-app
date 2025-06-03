@@ -15,8 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
         if (currentDateTimeEl) {
             currentDateTimeEl.textContent = now.toLocaleString('pt-BR', {
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit' // Adicionada a hora
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
             });
         }
         if (currentYearEl) {
@@ -26,75 +29,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function updateDbStatus(status) {
         if (dbStatusIconEl && dbStatusTextEl) {
-            let iconName = 'alert-triangle'; 
-            let iconColorClass = 'icon-status-db-disconnected'; 
+            let iconName = 'alert-triangle';
+            let iconColorClass = 'icon-status-db-disconnected';
             let textColorClass = 'text-status-disconnected';
             let statusMessage = 'Desconectado';
 
-            // Limpa classes de cor anteriores do ícone e do texto
-            // (O ícone em si não tem a classe de cor, mas o elemento pai ou o próprio ícone via CSS)
-            // A classe de cor será aplicada diretamente ao ícone via classList.add abaixo
             dbStatusIconEl.classList.remove('icon-status-db-connected', 'icon-status-db-disconnected');
             dbStatusTextEl.classList.remove('text-status-connected', 'text-status-disconnected', 'text-status-verifying');
 
             if (status && typeof status.connected !== 'undefined') {
                 if (status.connected) {
                     iconName = 'database';
-                    iconColorClass = 'icon-status-db-connected'; // Classe para cor verde clara no ícone
-                    textColorClass = 'text-status-connected';   // Classe para cor verde clara no texto
+                    iconColorClass = 'icon-status-db-connected';
+                    textColorClass = 'text-status-connected';
                     statusMessage = 'Conectado';
                 } else {
                     iconName = 'cloud-off';
-                    iconColorClass = 'icon-status-db-disconnected'; // Classe para cor vermelha clara no ícone
-                    textColorClass = 'text-status-disconnected';  // Classe para cor vermelha clara no texto
-                    // statusMessage já é 'Desconectado'
                 }
             } else {
                 statusMessage = 'Verificando...';
-                iconColorClass = 'icon-status-db-disconnected'; // Pode usar uma cor de alerta para o ícone
-                textColorClass = 'text-status-verifying';       // Classe para cor laranja/amarela no texto
+                textColorClass = 'text-status-verifying';
             }
 
             dbStatusIconEl.setAttribute('data-feather', iconName);
-            dbStatusIconEl.classList.add(iconColorClass); 
-            
+            dbStatusIconEl.classList.add(iconColorClass);
+
             dbStatusTextEl.textContent = statusMessage;
-            dbStatusTextEl.classList.add(textColorClass); 
+            dbStatusTextEl.classList.add(textColorClass);
 
             if (typeof feather !== 'undefined' && feather && typeof feather.replace === 'function') {
                 try {
-                    feather.replace(); 
+                    feather.replace();
                 } catch (e) {
                     console.error("Erro ao re-renderizar Feather Icons em updateDbStatus:", e);
                 }
             }
         } else {
-            if (!dbStatusIconEl) console.warn("Elemento dbStatusIconEl não encontrado no DOM.");
-            if (!dbStatusTextEl) console.warn("Elemento dbStatusTextEl não encontrado no DOM.");
+            if (!dbStatusIconEl) console.warn("Elemento dbStatusIconEl não encontrado no DOM (renderer_index.js).");
+            if (!dbStatusTextEl) console.warn("Elemento dbStatusTextEl não encontrado no DOM (renderer_index.js).");
         }
     }
 
-    // Inicializa data/ano/hora e busca status inicial do DB
     updateDateTime();
-    setInterval(updateDateTime, 10000); // Atualiza data e hora a cada 10 segundos para a hora mudar
+    setInterval(updateDateTime, 10000);
 
-    if (window.electronAPI && 
-        typeof window.electronAPI.onDbStatusUpdate === 'function' && 
-        typeof window.electronAPI.getInitialDbStatus === 'function') {
-        
+    if (
+        window.electronAPI &&
+        typeof window.electronAPI.onDbStatusUpdate === 'function' &&
+        typeof window.electronAPI.getInitialDbStatus === 'function'
+    ) {
         window.electronAPI.onDbStatusUpdate(updateDbStatus);
         window.electronAPI.getInitialDbStatus()
             .then(status => {
-                // console.log("Status inicial do DB recebido:", status); // Log de debug
                 updateDbStatus(status);
             })
             .catch(err => {
-                console.error("Erro ao obter status inicial do DB:", err);
-                updateDbStatus({ connected: false }); // Assume desconectado em caso de erro
+                console.error("Erro ao obter status inicial do DB (renderer_index.js):", err);
+                updateDbStatus({ connected: false });
             });
     } else {
         console.warn("electronAPI ou funções de status do DB não disponíveis.");
-        updateDbStatus({ connected: false }); // Fallback visual se API não estiver pronta
+        updateDbStatus({ connected: false });
     }
 
     // --- Navegação pelos Cards ---
@@ -103,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.electronAPI && typeof window.electronAPI.navigateTo === 'function') {
                 window.electronAPI.navigateTo('cadastro_cliente.html');
             } else {
-                console.warn("API de navegação não disponível.");
+                console.warn("API de navegação não disponível (renderer_index.js).");
             }
         });
     } else {
@@ -115,25 +110,74 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.electronAPI && typeof window.electronAPI.navigateTo === 'function') {
                 window.electronAPI.navigateTo('os.html');
             } else {
-                console.warn("API de navegação não disponível.");
+                console.warn("API de navegação não disponível (renderer_index.js).");
             }
         });
     } else {
         console.warn("Card 'goToOSCard' não encontrado no DOM.");
     }
 
-    // --- LÓGICA PARA OS MENUS NO HEADER FOI REMOVIDA ---
+    // --- Feedback de Relatórios ---
+    if (window.electronAPI && typeof window.electronAPI.onReportGenerated === 'function') {
+        const showToast = (message, type = 'success', duration = 5000) => {
+            const toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                console.warn('Toast container não encontrado!');
+                alert(message);
+                return;
+            }
 
-    // Inicializa Feather Icons (chamado uma vez após o DOM carregar)
+            const toastId = 'toast-index-' + Date.now();
+            const toastBgClass =
+                type === 'danger' ? 'bg-danger' :
+                type === 'warning' ? 'bg-warning text-dark' :
+                type === 'info' ? 'bg-info text-dark' : 'bg-success';
+
+            const toastHTML = `
+                <div id="${toastId}" class="toast align-items-center text-white ${toastBgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="${duration}">
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+            const toastElement = document.getElementById(toastId);
+            if (toastElement) {
+                const toast = new bootstrap.Toast(toastElement);
+                toast.show();
+                toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
+            }
+        };
+
+        window.electronAPI.onReportGenerated((result) => {
+            console.log("Resultado da geração do relatório:", result);
+
+            if (result && result.action === 'preview_closed') {
+                showToast(`Pré-visualização do relatório de ${result.reportType || 'desconhecido'} fechada.`, 'info', 4000);
+            } else if (result && result.success && result.action === 'saved') {
+                showToast(`Relatório de ${result.reportType || 'desconhecido'} salvo em: ${result.filePath}.`, 'success', 7000);
+            } else if (result && result.canceled) {
+                showToast(`Geração/salvamento do relatório de ${result.reportType || 'desconhecido'} cancelada.`, 'info');
+            } else if (result && !result.success && result.action === 'generate_busy') {
+                showToast(result.error || `Pré-visualização já aberta para relatório de ${result.reportType || 'desconhecido'}.`, 'warning', 7000);
+                return;
+            } else if (result && !result.success) {
+                showToast(`Erro ao gerar/salvar relatório: ${result.error || 'Erro desconhecido.'}`, 'danger', 7000);
+            }
+        });
+    } else {
+        console.warn("API onReportGenerated não disponível no renderer_index.js.");
+    }
+
+    // Inicializa Feather Icons
     if (typeof feather !== 'undefined' && feather && typeof feather.replace === 'function') {
         try {
-            // console.log("Inicializando Feather Icons a partir de renderer_index.js..."); // Debug
             feather.replace();
-            // console.log("Feather Icons inicializados."); // Debug
-        } catch(e) {
-            console.error("Erro ao renderizar Feather Icons na carga inicial (renderer_index.js):", e);
+        } catch (e) {
+            console.error("Erro ao renderizar Feather Icons na carga inicial:", e);
         }
     } else {
-        console.warn("Biblioteca Feather Icons (feather) não carregada ou 'replace' não é uma função.");
+        console.warn("Feather Icons não carregado ou inválido.");
     }
 });

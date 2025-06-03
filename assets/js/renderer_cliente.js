@@ -705,4 +705,64 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.warn("Biblioteca Feather Icons (feather) não carregada (cliente).");
     }
+
+    // --- Geração de Relatórios ---
+    const reportTypeSelect = document.getElementById('reportType');
+    const generateReportButton = document.getElementById('generateReportButton');
+    const reportResultsContainer = document.getElementById('reportResults');
+
+    if (generateReportButton) {
+        generateReportButton.addEventListener('click', async () => {
+            const reportType = reportTypeSelect.value;
+            if (!reportType) {
+                return showToast('Selecione um tipo de relatório para gerar.', 'warning');
+            }
+            // Desabilita o botão e mostra carregando
+            generateReportButton.disabled = true;
+            generateReportButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Gerando...`;
+
+            try {
+                if (!window.electronAPI || typeof window.electronAPI.generateReport !== 'function') {
+                    showToast('API de geração de relatórios não disponível.', 'danger');
+                    return;
+                }
+                // Chama a função de geração de relatório da API
+                const result = await window.electronAPI.generateReport(reportType);
+                console.log("Resultado da geração de relatório:", result);
+
+                if (result && result.success) {
+                    showToast('Relatório gerado com sucesso!', 'success');
+                    // Aqui você pode querer fazer o download automático do relatório ou abrir em uma nova aba, dependendo da sua lógica
+                    // Exemplo para download automático:
+                    const a = document.createElement('a');
+                    a.href = result.filePath; // Supondo que result.filePath tenha o caminho do arquivo gerado
+                    a.download = `relatorio_${reportType}_${new Date().toISOString().slice(0,10)}.xlsx`; // Nome do arquivo
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    showToast(result?.message || 'Erro desconhecido ao gerar relatório.', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao gerar relatório:', error);
+                showToast(`Erro crítico ao gerar relatório: ${error.message || error}`, 'danger');
+            } finally {
+                // Reabilita o botão
+                generateReportButton.disabled = false;
+                generateReportButton.innerHTML = 'Gerar Relatório';
+            }
+        });
+    }
+    
+    // --- IPC Main Listeners (para comunicação com o processo principal) ---
+    const { ipcRenderer } = window.electronAPI || {};
+    if (ipcRenderer) {
+        ipcRenderer.on('report-generated', (event, arg) => {
+            console.log("Evento 'report-generated' recebido:", arg);
+            // Aqui você pode implementar a lógica para lidar com o evento de relatório gerado, se necessário
+            // Por exemplo, mostrar uma notificação ou atualizar uma lista de relatórios disponíveis para download
+        });
+    } else {
+        console.warn("ipcRenderer não disponível. Comunicação com o processo principal pode não funcionar.");
+    }
 });

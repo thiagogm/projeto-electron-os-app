@@ -33,17 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterStatusSelect = document.getElementById('filterStatus');
     const searchOsListInputField = document.getElementById('searchOsInput');
     const osPerPageSelect = document.getElementById('osPerPageSelect');
-    const applyOsFiltersButton = document.getElementById('applyOsFiltersButton');
+    // const applyOsFiltersButton = document.getElementById('applyOsFiltersButton'); // REMOVIDO
     const osPaginationControls = document.getElementById('osPaginationControls');
-
-    // --- Seletores do Rodapé (DEVEM SER IGUAIS EM TODOS OS RENDERERS) ---
-    const currentDateTimeEl = document.getElementById('currentDateTime');
-    const currentYearEl = document.getElementById('currentYear');
-    const dbStatusIconEl = document.getElementById('dbStatusIcon');
-    const dbStatusTextEl = document.getElementById('dbStatusText');
     
     let currentOsListPage = 1;
-
 
     // --- Funções Utilitárias de UI (Toasts e Modals) ---
     function showToast(message, type = 'success') {
@@ -92,7 +85,12 @@ document.addEventListener('DOMContentLoaded', () => {
         bsModal.show();
     }
 
-     // --- LÓGICA DO RODAPÉ (Padronizada) ---
+    // --- LÓGICA DO RODAPÉ (Padronizada) ---
+    const currentDateTimeEl = document.getElementById('currentDateTime');
+    const currentYearEl = document.getElementById('currentYear');
+    const dbStatusIconEl = document.getElementById('dbStatusIcon');
+    const dbStatusTextEl = document.getElementById('dbStatusText');
+
     function updateDateTime() {
         const now = new Date();
         if (currentDateTimeEl) {
@@ -113,97 +111,60 @@ document.addEventListener('DOMContentLoaded', () => {
             let textColorClass = 'text-status-disconnected';
             let statusMessage = 'Desconectado';
 
-            // Limpa classes de cor anteriores do ícone e do texto
             dbStatusIconEl.classList.remove('icon-status-db-connected', 'icon-status-db-disconnected');
             dbStatusTextEl.classList.remove('text-status-connected', 'text-status-disconnected', 'text-status-verifying');
 
             if (status && typeof status.connected !== 'undefined') {
                 if (status.connected) {
                     iconName = 'database';
-                    iconColorClass = 'icon-status-db-connected'; // Classe para cor verde clara no ícone
-                    textColorClass = 'text-status-connected';   // Classe para cor verde clara no texto
+                    iconColorClass = 'icon-status-db-connected';
+                    textColorClass = 'text-status-connected';
                     statusMessage = 'Conectado';
                 } else {
                     iconName = 'cloud-off';
-                    // iconColorClass ('icon-status-db-disconnected') e textColorClass ('text-status-disconnected') já são os de desconectado
                 }
             } else {
                 statusMessage = 'Verificando...';
-                iconColorClass = 'icon-status-db-disconnected'; // Usa cor de desconectado para o ícone em "verificando"
-                textColorClass = 'text-status-verifying';       // Classe para cor laranja/amarela no texto
+                textColorClass = 'text-status-verifying'; 
             }
-
             dbStatusIconEl.setAttribute('data-feather', iconName);
             dbStatusIconEl.classList.add(iconColorClass); 
-            
             dbStatusTextEl.textContent = statusMessage;
             dbStatusTextEl.classList.add(textColorClass); 
-
-            // Re-renderiza os ícones Feather APENAS se a biblioteca estiver carregada
-            if (typeof feather !== 'undefined' && feather && typeof feather.replace === 'function') {
-                try {
-                    feather.replace(); 
-                } catch (e) {
-                    console.error("Erro ao re-renderizar Feather Icons em updateDbStatus:", e);
-                }
-            }
-        } else {
-            if (!dbStatusIconEl) console.warn("Elemento dbStatusIconEl não encontrado no DOM (renderer_os.js).");
-            if (!dbStatusTextEl) console.warn("Elemento dbStatusTextEl não encontrado no DOM (renderer_os.js).");
+            if (typeof feather !== 'undefined' && feather.replace) feather.replace();
         }
     }
-
-    // Inicializa data/ano/hora e busca status inicial do DB
     updateDateTime();
-    setInterval(updateDateTime, 10000); // Atualiza a cada 10 segundos
-
-    if (window.electronAPI && 
-        typeof window.electronAPI.onDbStatusUpdate === 'function' && 
-        typeof window.electronAPI.getInitialDbStatus === 'function') {
-        
+    setInterval(updateDateTime, 10000);
+    if (window.electronAPI && window.electronAPI.onDbStatusUpdate && window.electronAPI.getInitialDbStatus) {
         window.electronAPI.onDbStatusUpdate(updateDbStatus);
-        window.electronAPI.getInitialDbStatus()
-            .then(status => {
-                updateDbStatus(status);
-            })
-            .catch(err => {
-                console.error("Erro ao obter status inicial do DB (renderer_os.js):", err);
-                updateDbStatus({ connected: false });
-            });
+        window.electronAPI.getInitialDbStatus().then(updateDbStatus).catch(() => updateDbStatus({ connected: false }));
     } else {
-        console.warn("electronAPI ou funções de status do DB não disponíveis (renderer_os.js).");
-        updateDbStatus({ connected: false }); 
+        updateDbStatus({ connected: false });
     }
+    // --- FIM DA LÓGICA DO RODAPÉ ---
 
-    // --- Rodapé e Navegação ---
-    const currentDateEl = document.getElementById('currentDate');
-  
-
-    function updateDateFooter() {
-        if (currentDateEl) currentDateEl.textContent = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    }
-    updateDateFooter(); setInterval(updateDateFooter, 60000);
-
-    async function updateDbStatusFooter(status) {
-        if (dbStatusIconEl && dbStatusTextEl && status && typeof status.connected !== 'undefined') {
-            dbStatusIconEl.src = status.connected ? '../assets/icons/database-check.png' : '../assets/icons/database-slash.png';
-            dbStatusTextEl.textContent = status.connected ? 'Conectado' : 'Desconectado';
-        } else if (dbStatusIconEl && dbStatusTextEl) {
-            dbStatusIconEl.src = '../assets/icons/database-slash.png';
-            dbStatusTextEl.textContent = 'Verificando...';
-        }
-    }
-    if(window.electronAPI && typeof window.electronAPI.onDbStatusUpdate === 'function') {
-        window.electronAPI.onDbStatusUpdate(updateDbStatusFooter);
-        window.electronAPI.getInitialDbStatus().then(updateDbStatusFooter).catch(() => updateDbStatusFooter({ connected: false }));
-    } else {
-        console.warn("electronAPI de status do DB não disponível.");
-        updateDbStatusFooter({ connected: false }); 
-    }
-
+    // --- Navegação do Header (Padronizada) ---
     document.getElementById('goHomeNav')?.addEventListener('click', () => window.electronAPI?.navigateTo('index.html'));
     document.getElementById('goToClientesPage')?.addEventListener('click', () => window.electronAPI?.navigateTo('cadastro_cliente.html'));
-    
+
+    // --- Funções de Formatação (Idealmente de arquivos utilitários) ---
+    function formatarCPF(cpf) {
+        if (!cpf) return '';
+        let cpfLimpo = cpf.toString().replace(/\D/g, '');
+        if (cpfLimpo.length > 11) cpfLimpo = cpfLimpo.substring(0,11);
+        if (cpfLimpo.length <= 3) return cpfLimpo;
+        if (cpfLimpo.length <= 6) return cpfLimpo.replace(/(\d{3})(\d+)/, '$1.$2');
+        if (cpfLimpo.length <= 9) return cpfLimpo.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
+        return cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+    function formatarTelefone(tel) { 
+        if (!tel) return '';
+        const telLimpo = tel.toString().replace(/\D/g, '');
+        if (telLimpo.length === 11) return `(${telLimpo.substring(0,2)}) ${telLimpo.substring(2,7)}-${telLimpo.substring(7,11)}`;
+        if (telLimpo.length === 10) return `(${telLimpo.substring(0,2)}) ${telLimpo.substring(2,6)}-${telLimpo.substring(6,10)}`;
+        return telLimpo; 
+    }
 
     // --- Lógica de Busca de Cliente para a OS ---
     let clientSearchTimeout;
@@ -256,21 +217,26 @@ document.addEventListener('DOMContentLoaded', () => {
             item.href = '#';
             item.classList.add('list-group-item', 'list-group-item-action');
             item.innerHTML = `<strong>${client.name}</strong> <small class="text-muted d-block">CPF: ${formatarCPF(client.cpf || '')}</small>`;
-            // Armazenar o ID como string no dataset
             item.dataset.clientId = client && client._id ? client._id.toString() : ''; 
 
             item.addEventListener('click', (e) => {
                 e.preventDefault();
-                const selectedClientData = clients.find(c => c._id.toString() === e.currentTarget.dataset.clientId);
+                const clientIdFromDataset = e.currentTarget.dataset.clientId;
+                const selectedClientData = clients.find(c => (c._id ? c._id.toString() : '') === clientIdFromDataset);
+                
                 if (selectedClientData) {
-                    selectClient(selectedClientData); // Passa o objeto cliente inteiro
+                    selectClient(selectedClientData);
                 } else {
-                    console.error("Cliente não encontrado na lista original ao clicar.");
-                    showToast("Erro ao selecionar cliente.", "danger");
+                    console.error("Cliente não encontrado na lista original ao clicar. ID do dataset:", clientIdFromDataset);
+                    showToast("Erro ao selecionar cliente: ID não encontrado na lista carregada.", "danger");
                 }
-                clientSearchResultsContainer.innerHTML = ''; clientSearchResultsContainer.style.display = 'none';
+                clientSearchResultsContainer.innerHTML = '';
+                clientSearchResultsContainer.style.display = 'none';
                 if (searchClientInput && selectedClientData) searchClientInput.value = selectedClientData.name; 
-                if (searchClientInput) { searchClientInput.classList.remove('is-invalid'); if (selectedClientData) searchClientInput.classList.add('is-valid'); }
+                if (searchClientInput) {
+                    searchClientInput.classList.remove('is-invalid');
+                    if (selectedClientData) searchClientInput.classList.add('is-valid');
+                }
             });
             clientSearchResultsContainer.appendChild(item);
         });
@@ -284,17 +250,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function selectClient(client) {
-        if (selectedClientIdField) selectedClientIdField.value = client && client._id ? client._id.toString() : ''; // CORRIGIDO
-        if (selectedClientInfoDiv) {
-            if (client && client.name) {
-                selectedClientInfoDiv.innerHTML = `<strong>${client.name}</strong><br><small>CPF: ${formatarCPF(client.cpf || '')} | Tel: ${formatarTelefone(client.phone || '')}</small>`;
-            } else {
-                selectedClientInfoDiv.innerHTML = 'Nenhum cliente selecionado.';
+        console.log("[Renderer OS - selectClient] Objeto client recebido:", client);
+        if (client && client._id) {
+            const clientIdString = client._id.toString();
+            console.log("[Renderer OS - selectClient] ID do cliente (string):", clientIdString);
+            
+            if (selectedClientIdField) {
+                selectedClientIdField.value = clientIdString;
+                console.log("[Renderer OS - selectClient] selectedClientIdField.value definido para:", selectedClientIdField.value);
             }
-        }
-        if (searchClientInput) {
-            searchClientInput.classList.remove('is-invalid'); 
-            if (client && client._id) searchClientInput.classList.add('is-valid'); 
+            if (selectedClientInfoDiv) {
+                selectedClientInfoDiv.innerHTML = `<strong>${client.name || ''}</strong><br><small>CPF: ${formatarCPF(client.cpf || '')} | Tel: ${formatarTelefone(client.phone || '')}</small>`;
+            }
+            if (searchClientInput) {
+                searchClientInput.classList.remove('is-invalid');
+                searchClientInput.classList.add('is-valid');
+            }
+        } else {
+            console.error("[Renderer OS - selectClient] Tentativa de selecionar cliente inválido ou sem _id:", client);
+            clearSelectedClient();
+            if (selectedClientInfoDiv) selectedClientInfoDiv.innerHTML = 'Erro: Cliente inválido.';
         }
     }
 
@@ -333,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <input type="text" class="form-control form-control-sm part-total-price bg-light" placeholder="Total R$" value="${((part.quantity || 1) * parseFloat(part.unitPrice || 0)).toFixed(2)}" readonly>
             </div>
             <div class="col-sm-1 text-end">
-                <button type="button" class="btn btn-sm btn-outline-danger remove-part-button" aria-label="Remover Peça"><i class="bi bi-x-lg"></i></button>
+                <button type="button" class="btn btn-sm btn-outline-danger remove-part-button" aria-label="Remover Peça"><i data-feather="x-circle" class="icon-sm-action"></i></button>
             </div>`;
         partsContainer.appendChild(row);
         
@@ -342,19 +317,18 @@ document.addEventListener('DOMContentLoaded', () => {
             createdRow.querySelectorAll('.part-name, .part-quantity, .part-unit-price').forEach(input => {
                 input.addEventListener('input', () => {
                     if (input.checkValidity()) {
-                        input.classList.remove('is-invalid');
-                        input.classList.add('is-valid');
-                    } // A classe 'is-invalid' será tratada pela validação do formulário no submit
+                        input.classList.remove('is-invalid'); input.classList.add('is-valid');
+                    } else {
+                        input.classList.remove('is-valid'); // Garante que 'is-valid' seja removido se tornou inválido
+                    }
                 });
             });
             createdRow.querySelectorAll('.cost-input').forEach(input => input.addEventListener('input', calculateTotalCost));
             const removeButton = createdRow.querySelector('.remove-part-button');
             if (removeButton) {
-                removeButton.addEventListener('click', () => {
-                    createdRow.remove();
-                    calculateTotalCost();
-                });
+                removeButton.addEventListener('click', () => { createdRow.remove(); calculateTotalCost(); });
             }
+            if (typeof feather !== 'undefined' && feather.replace) feather.replace(); // Para o ícone 'x-circle'
         }
         calculateTotalCost();
     }
@@ -369,7 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const unitPriceInput = row.querySelector('.part-unit-price');
                     const quantity = parseFloat(quantityInput?.value) || 0;
                     const unitPrice = parseFloat(unitPriceInput?.value) || 0;
-                    
                     const partTotalPriceField = row.querySelector('.part-total-price');
                     if(partTotalPriceField) partTotalPriceField.value = (quantity * unitPrice).toFixed(2);
                 }
@@ -383,22 +356,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 calculateTotalCost();
                 const value = parseFloat(field.value);
                 if (isNaN(value) || value < 0) {
-                    field.classList.add('is-invalid');
-                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid'); field.classList.remove('is-valid');
                 } else {
-                    field.classList.remove('is-invalid');
-                    field.classList.add('is-valid');
+                    field.classList.remove('is-invalid'); field.classList.add('is-valid');
                 }
             });
             field.addEventListener('blur', (e) => { 
                 const value = parseFloat(e.target.value || 0);
                 e.target.value = value.toFixed(2);
                 if (value >= 0) {
-                    e.target.classList.add('is-valid');
-                    e.target.classList.remove('is-invalid');
+                    e.target.classList.add('is-valid'); e.target.classList.remove('is-invalid');
                 } else {
-                    e.target.classList.add('is-invalid');
-                    e.target.classList.remove('is-valid');
+                    e.target.classList.add('is-invalid'); e.target.classList.remove('is-valid');
                 }
             });
         }
@@ -419,26 +388,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function validateOsForm() {
         let isValid = true;
         if (!osForm) return false; 
-        // Não adicionar 'was-validated' aqui, mas sim no submit, para não validar campos vazios prematuramente.
 
         const fieldsToValidate = [
-            { el: searchClientInput,    check: () => selectedClientIdField?.value, msg: "Selecione um cliente." },
-            { el: equipmentField,       check: () => equipmentField?.value.trim(), msg: "Descreva o equipamento." },
-            { el: reportedIssueField,   check: () => reportedIssueField?.value.trim(), msg: "Descreva o defeito relatado." },
-            { el: statusOsField,        check: () => statusOsField?.value, msg: "Selecione um status." }
+            { el: searchClientInput, check: () => selectedClientIdField?.value, msg: "Selecione um cliente." },
+            { el: equipmentField, check: () => equipmentField?.value.trim(), msg: "Descreva o equipamento." },
+            { el: reportedIssueField, check: () => reportedIssueField?.value.trim(), msg: "Descreva o defeito relatado." },
+            { el: statusOsField, check: () => statusOsField?.value, msg: "Selecione um status." }
         ];
 
         fieldsToValidate.forEach(item => {
             if (item.el) {
-                const feedbackDiv = item.el.closest('.mb-3, .col-md-7, .col-md-4')?.querySelector('.invalid-feedback'); // Tenta encontrar o div de feedback
+                const feedbackDiv = item.el.closest('.mb-3, .col-md-7')?.querySelector('.invalid-feedback'); // Ajustado para buscar feedback
                 if (!item.check()) {
-                    item.el.classList.add('is-invalid');
-                    item.el.classList.remove('is-valid');
+                    item.el.classList.add('is-invalid'); item.el.classList.remove('is-valid');
                     if (feedbackDiv) feedbackDiv.textContent = item.msg;
                     isValid = false;
                 } else {
-                    item.el.classList.remove('is-invalid');
-                    item.el.classList.add('is-valid');
+                    item.el.classList.remove('is-invalid'); item.el.classList.add('is-valid');
                 }
             }
         });
@@ -448,13 +414,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const val = parseFloat(field.value);
                 const feedbackDiv = field.closest('.mb-3')?.querySelector('.invalid-feedback');
                 if (isNaN(val) || val < 0) {
-                    field.classList.add('is-invalid');
-                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid'); field.classList.remove('is-valid');
                     if (feedbackDiv) feedbackDiv.textContent = "Valor deve ser numérico e não negativo.";
                     isValid = false;
                 } else {
-                    field.classList.remove('is-invalid');
-                    field.classList.add('is-valid');
+                    field.classList.remove('is-invalid'); field.classList.add('is-valid');
                 }
             }
         });
@@ -466,30 +430,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const partUnitPriceField = row.querySelector('.part-unit-price');
 
             [partNameField, partQuantityField, partUnitPriceField].forEach(pf => {
-                if(pf) { // Verifica se o campo da peça existe
+                if(pf) {
                     const feedbackDiv = pf.closest('div[class*="col-"]')?.querySelector('.invalid-feedback');
-                    if (pf.required && !pf.value.trim() && pf.type !== 'number') { // Para nome
-                        pf.classList.add('is-invalid'); pf.classList.remove('is-valid');
-                        if (feedbackDiv) feedbackDiv.textContent = "Obrigatório.";
-                        partsAreValid = false;
+                    let fieldIsValid = true;
+                    if (pf.required && ((pf.type === 'text' && !pf.value.trim()) || (pf.type === 'number' && pf.value === ''))) {
+                        fieldIsValid = false;
+                        if (feedbackDiv) feedbackDiv.textContent = pf.placeholder === "Nome da Peça" ? "Nome obrigatório." : "Obrigatório.";
                     } else if (pf.type === 'number') {
                         const val = parseFloat(pf.value);
                         const min = parseFloat(pf.min);
                         if (isNaN(val) || (pf.hasAttribute('min') && val < min)) {
-                            pf.classList.add('is-invalid'); pf.classList.remove('is-valid');
+                            fieldIsValid = false;
                             if (feedbackDiv) feedbackDiv.textContent = `Mínimo ${min}.`;
-                            partsAreValid = false;
-                        } else {
-                            pf.classList.remove('is-invalid'); pf.classList.add('is-valid');
                         }
-                    } else if (pf.value.trim()) { // Para nome da peça preenchido
-                         pf.classList.remove('is-invalid'); pf.classList.add('is-valid');
+                    }
+                    
+                    if (fieldIsValid && pf.value.trim()) { // Adiciona is-valid apenas se preenchido e válido
+                        pf.classList.remove('is-invalid'); pf.classList.add('is-valid');
+                    } else if (!fieldIsValid) {
+                        pf.classList.add('is-invalid'); pf.classList.remove('is-valid');
+                        partsAreValid = false;
+                    } else { // Campo não obrigatório e vazio, ou opcional e válido
+                        pf.classList.remove('is-invalid', 'is-valid');
                     }
                 }
             });
         });
         if (!partsAreValid) isValid = false;
-
         return isValid;
     }
 
@@ -498,12 +465,30 @@ document.addEventListener('DOMContentLoaded', () => {
         osForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             event.stopPropagation();
-            osForm.classList.add('was-validated'); // Ativa feedback visual do Bootstrap AGORA
+            osForm.classList.add('was-validated');
 
-            if (!validateOsForm()) { // Roda a validação
+            if (!validateOsForm()) {
                 showToast('Por favor, corrija os erros no formulário.', 'warning');
-                const firstInvalid = osForm.querySelector(':invalid, .is-invalid'); // Considera ambos
+                const firstInvalid = osForm.querySelector('.is-invalid'); // Procura o primeiro campo inválido
                 if (firstInvalid && typeof firstInvalid.focus === 'function') firstInvalid.focus();
+                return;
+            }
+
+            const clientIdForOs = selectedClientIdField?.value;
+            console.log("[Renderer OS - Submit] osData.clientId ANTES do envio:", clientIdForOs, "Tipo:", typeof clientIdForOs);
+
+            if (!clientIdForOs || typeof clientIdForOs !== 'string' || !clientIdForOs.match(/^[0-9a-fA-F]{24}$/)) {
+                console.error("[Renderer OS - Submit] ERRO CRÍTICO: clientId para OS é inválido!", clientIdForOs);
+                showToast("Erro: ID do cliente inválido. Selecione o cliente novamente.", "danger");
+                searchClientInput?.classList.add('is-invalid');
+                searchClientInput?.focus();
+                if(saveOsButton) { // Restaura o botão
+                    saveOsButton.disabled = false;
+                    const buttonText = osIdField?.value ? "Atualizar OS" : "Salvar OS";
+                    const iconName = osIdField?.value ? "arrow-clockwise" : "check-circle";
+                    saveOsButton.innerHTML = `<i data-feather="${iconName}" class="icon-btn"></i> ${buttonText}`;
+                    if (typeof feather !== 'undefined' && feather.replace) feather.replace();
+                }
                 return;
             }
 
@@ -519,10 +504,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const osData = {
                 osNumber: osNumberField?.value,
-                clientId: selectedClientIdField?.value, // Já deve ser string do _id.toString()
+                clientId: clientIdForOs, 
                 clientName: selectedClientInfoDiv?.querySelector('strong')?.textContent || 'N/A',
-                clientCpf: selectedClientInfoDiv?.querySelector('small')?.textContent.split('CPF: ')[1]?.split(' |')[0].replace(/\D/g,'') || 'N/A', // Limpa CPF
-                clientPhone: selectedClientInfoDiv?.querySelector('small')?.textContent.split('Tel: ')[1]?.replace(/\D/g,'') || 'N/A', // Limpa Telefone
+                clientCpf: selectedClientInfoDiv?.querySelector('small')?.textContent.includes('CPF: ') ? selectedClientInfoDiv.querySelector('small').textContent.split('CPF: ')[1].split(' |')[0].replace(/\D/g,'') : '',
+                clientPhone: selectedClientInfoDiv?.querySelector('small')?.textContent.includes('Tel: ') ? selectedClientInfoDiv.querySelector('small').textContent.split('Tel: ')[1].replace(/\D/g,'') : '',
                 equipment: equipmentField?.value.trim(),
                 accessories: accessoriesField?.value.trim(),
                 reportedIssue: reportedIssueField?.value.trim(),
@@ -534,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 otherCosts: parseFloat(otherCostsField?.value || 0) || 0,
                 totalCost: parseFloat(totalCostField?.value || 0) || 0,
             };
-
+            
             const currentOsId = osIdField?.value;
             let result;
 
@@ -547,7 +532,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!window.electronAPI || 
                     (currentOsId && typeof window.electronAPI.updateOs !== 'function') ||
                     (!currentOsId && typeof window.electronAPI.addOS !== 'function')) {
-                    showToast('API de salvamento de OS não está disponível.', 'danger'); return;
+                    showToast('API de salvamento de OS não está disponível.', 'danger'); 
+                    if(saveOsButton) { 
+                        saveOsButton.disabled = false; 
+                        const buttonText = currentOsId ? "Atualizar OS" : "Salvar OS";
+                        const iconName = currentOsId ? "arrow-clockwise" : "check-circle";
+                        saveOsButton.innerHTML = `<i data-feather="${iconName}" class="icon-btn"></i> ${buttonText}`;
+                        if (typeof feather !== 'undefined' && feather.replace) feather.replace();
+                    }
+                    return;
                 }
 
                 if (currentOsId) {
@@ -569,7 +562,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } finally {
                 if (saveOsButton) {
                     saveOsButton.disabled = false;
-                    saveOsButton.innerHTML = `<i class="bi bi-check-lg"></i> Salvar OS`;
+                    const buttonText = osIdField?.value ? "Atualizar OS" : "Salvar OS";
+                    const iconName = osIdField?.value ? "arrow-clockwise" : "check-circle";
+                    saveOsButton.innerHTML = `<i data-feather="${iconName}" class="icon-btn"></i> ${buttonText}`;
+                    if (typeof feather !== 'undefined' && feather.replace) feather.replace();
                 }
             }
         });
@@ -584,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
             osForm.classList.remove('was-validated'); 
         }
         if (osIdField) osIdField.value = '';
-        clearSelectedClient(); // Limpa informações do cliente e input de busca
+        clearSelectedClient(); 
         if (partsContainer) partsContainer.innerHTML = ''; 
         if (laborCostField) laborCostField.value = '0.00';
         if (otherCostsField) otherCostsField.value = '0.00';
@@ -597,7 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const nextNumber = await window.electronAPI.getNextOsNumber();
                 if (osNumberField) osNumberField.value = nextNumber;
             } else if(osNumberField) {
-                 osNumberField.value = `OS-DEF${Date.now().toString().slice(-3)}`; // Fallback
+                 osNumberField.value = `OS-DEF${Date.now().toString().slice(-3)}`;
                  if(!window.electronAPI || !window.electronAPI.getNextOsNumber) console.warn("electronAPI.getNextOsNumber não disponível.");
             }
         } catch (e) {
@@ -607,11 +603,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (saveOsButton) {
-            saveOsButton.innerHTML = `<i class="bi bi-check-lg"></i> Salvar OS`;
+            saveOsButton.innerHTML = `<i data-feather="check-circle" class="icon-btn"></i> Salvar OS`;
             saveOsButton.disabled = false;
+            if (typeof feather !== 'undefined' && feather.replace) feather.replace();
         }
         if (deleteOsButton) deleteOsButton.classList.add('d-none');
-        if (searchClientInput) searchClientInput.focus(); // Foca na busca de cliente
+        if (searchClientInput) searchClientInput.focus();
         
         osForm?.querySelectorAll('.form-control, .form-select').forEach(field => {
             field.classList.remove('is-invalid', 'is-valid');
@@ -621,7 +618,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleDeleteOs() {
         const currentOsId = osIdField?.value;
         if (!currentOsId) return;
-
         showConfirmationModal('Tem certeza que deseja excluir esta Ordem de Serviço? Esta ação não pode ser desfeita.', async () => {
             try {
                 if (!window.electronAPI || typeof window.electronAPI.deleteOs !== 'function') {
@@ -643,9 +639,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Listagem, Filtragem e Paginação de OS ---
-    if (applyOsFiltersButton) {
-        applyOsFiltersButton.addEventListener('click', () => {
-            currentOsListPage = 1; 
+    if (filterStatusSelect) { // ADICIONADO LISTENER PARA FILTRO DE STATUS
+        filterStatusSelect.addEventListener('change', () => {
+            currentOsListPage = 1;
             loadOsListWithCurrentFilters();
         });
     }
@@ -655,8 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadOsListWithCurrentFilters();
         });
     }
-    
-    let searchOsListTimeout; // Renomeado para clareza
+    let searchOsListTimeout;
     if (searchOsListInputField) {
         searchOsListInputField.addEventListener('input', () => {
             clearTimeout(searchOsListTimeout);
@@ -666,60 +661,44 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 400);
         });
     }
+    // REMOVIDO O LISTENER PARA applyOsFiltersButton
 
     async function loadOsListWithCurrentFilters() {
         const searchTerm = searchOsListInputField?.value.trim() || '';
         const statusFilter = filterStatusSelect?.value || '';
         const limit = parseInt(osPerPageSelect?.value) || 10;
-        // Chama loadOsList, que já atualiza currentOsListPage
         await loadOsList(currentOsListPage, limit, searchTerm, statusFilter); 
     }
 
     async function loadOsList(page = 1, limit = 10, searchTerm = '', status = '') {
-        currentOsListPage = page; // Garante que a página atual está correta
-        if (osTableBody) {
-            osTableBody.innerHTML = '<tr><td colspan="7" class="text-center">Carregando Ordens de Serviço... <span class="spinner-border spinner-border-sm"></span></td></tr>';
-        } else {
-            console.warn("Elemento osTableBody não encontrado.");
-            return;
-        }
+        currentOsListPage = page;
+        if (!osTableBody) { console.warn("Elemento osTableBody não encontrado."); return; }
+        osTableBody.innerHTML = '<tr><td colspan="7" class="text-center">Carregando... <span class="spinner-border spinner-border-sm"></span></td></tr>';
 
         try {
             if (!window.electronAPI || typeof window.electronAPI.getOsListPaginated !== 'function') {
                 showToast('API de busca de OS não está disponível.', 'danger');
-                if (osTableBody) osTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">API indisponível.</td></tr>`;
-                renderOsPagination(0, limit, page);
-                return;
+                osTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">API indisponível.</td></tr>`;
+                renderOsPagination(0, limit, page); return;
             }
+            const result = await window.electronAPI.getOsListPaginated({ page, limit, searchTerm, filters: { status } });
+            console.log("[Renderer OS - loadOsList] Resultado:", JSON.stringify(result, null, 2));
 
-            const result = await window.electronAPI.getOsListPaginated({ 
-                page, 
-                limit, 
-                searchTerm, 
-                filters: { status }
-            });
-            
-            console.log("[Renderer OS] Resultado de getOsListPaginated:", JSON.stringify(result, null, 2)); // Log detalhado
-
-            if (!result || typeof result.success === 'undefined') { // Checagem mais robusta do resultado
-                showToast('Resposta inválida do servidor ao carregar lista de OS.', 'danger');
-                if (osTableBody) osTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Resposta inválida do servidor.</td></tr>`;
-                renderOsPagination(0, limit, page);
-                return;
+            if (!result || typeof result.success === 'undefined') {
+                showToast('Resposta inválida do servidor.', 'danger');
+                osTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Resposta inválida.</td></tr>`;
+                renderOsPagination(0, limit, page); return;
             }
-            
             if(!result.success){
-                showToast(result.message || 'Falha ao carregar lista de OS.', 'danger');
-                if (osTableBody) osTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${result.message || 'Erro ao carregar OS.'}</td></tr>`;
-                renderOsPagination(0, limit, page);
-                return;
+                showToast(result.message || 'Falha ao carregar OS.', 'danger');
+                osTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${result.message || 'Erro.'}</td></tr>`;
+                renderOsPagination(0, limit, page); return;
             }
             
             const { data: osList, totalCount } = result;
             osTableBody.innerHTML = ''; 
-
             if (!osList || osList.length === 0) {
-                osTableBody.innerHTML = '<tr><td colspan="7" class="text-center">Nenhuma Ordem de Serviço encontrada com os filtros aplicados.</td></tr>';
+                osTableBody.innerHTML = '<tr><td colspan="7" class="text-center">Nenhuma OS encontrada.</td></tr>';
             } else {
                 osList.forEach(os => {
                     const row = osTableBody.insertRow();
@@ -731,17 +710,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td><span class="badge bg-${getStatusBadgeColor(os.status)}">${os.status || 'N/D'}</span></td>
                         <td>${parseFloat(os.totalCost || 0).toFixed(2)}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary edit-os-btn" data-id="${os._id}" title="Editar OS"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-sm btn-outline-primary edit-os-btn" data-id="${os._id ? os._id.toString() : ''}" title="Editar OS"><i data-feather="edit-3" class="icon-sm-action"></i></button>
                         </td>`;
                     const editButton = row.querySelector('.edit-os-btn');
-                    if (editButton) editButton.addEventListener('click', () => loadOsForEditing(os._id));
+                    if (editButton) editButton.addEventListener('click', () => {
+                        const osIdToLoad = editButton.dataset.id;
+                        if (osIdToLoad) loadOsForEditing(osIdToLoad);
+                        else showToast("ID da OS não encontrado.", "warning");
+                    });
                 });
             }
             renderOsPagination(totalCount, limit, page);
+            if (typeof feather !== 'undefined' && feather.replace) feather.replace();
         } catch (error) {
-            console.error("Erro catastrófico ao carregar lista de OS paginada:", error);
-            showToast('Erro crítico ao carregar lista de OS.', 'danger');
-            if (osTableBody) osTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erro crítico ao carregar OS.</td></tr>';
+            console.error("Erro catastrófico ao carregar OS:", error);
+            showToast('Erro crítico ao carregar OS.', 'danger');
+            if (osTableBody) osTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erro crítico.</td></tr>';
             renderOsPagination(0, limit, page);
         }
     }
@@ -750,7 +734,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!osPaginationControls) return;
         osPaginationControls.innerHTML = '';
         const totalPages = Math.ceil(totalItems / itemsPerPage);
-
         if (totalPages <= 1) return;
 
         const createPageItem = (pageTarget, textDisplay, isActive, isDisabled) => {
@@ -758,118 +741,92 @@ document.addEventListener('DOMContentLoaded', () => {
             li.classList.add('page-item');
             if (isActive) li.classList.add('active');
             if (isDisabled) li.classList.add('disabled');
-            
             const a = document.createElement('a');
-            a.classList.add('page-link');
-            a.href = '#';
-            a.textContent = textDisplay;
-            if (!isDisabled && pageTarget !== 0) { // pageTarget 0 para reticências
+            a.classList.add('page-link'); a.href = '#'; a.textContent = textDisplay;
+            if (!isDisabled && pageTarget !== 0) {
                 a.addEventListener('click', (e) => {
                     e.preventDefault();
-                    currentOsListPage = pageTarget; // ATUALIZA A PÁGINA ATUAL
-                    loadOsListWithCurrentFilters(); // CHAMA A FUNÇÃO QUE USA A PÁGINA ATUAL
+                    currentOsListPage = pageTarget; 
+                    loadOsListWithCurrentFilters(); 
                 });
             }
-            li.appendChild(a);
-            return li;
+            li.appendChild(a); return li;
         };
         
         osPaginationControls.appendChild(createPageItem(currentPage - 1, 'Anterior', false, currentPage === 1));
-
-        let startPage = Math.max(1, currentPage - 1); // Mostrar menos números, ex: 1 antes, atual, 1 depois
-        let endPage = Math.min(totalPages, currentPage + 1);
-        
-        if (totalPages > 3) { // Lógica mais complexa para muitas páginas
-            if (currentPage <= 2) {
-                startPage = 1;
-                endPage = Math.min(totalPages, 3);
-            } else if (currentPage >= totalPages - 1) {
-                startPage = Math.max(1, totalPages - 2);
-                endPage = totalPages;
-            }
-        } else { // Poucas páginas, mostra todas
-             startPage = 1;
-             endPage = totalPages;
-        }
-        
+        let startPage = Math.max(1, currentPage - 1); let endPage = Math.min(totalPages, currentPage + 1);
+        if (totalPages > 3) {
+            if (currentPage <= 2) { startPage = 1; endPage = Math.min(totalPages, 3); } 
+            else if (currentPage >= totalPages - 1) { startPage = Math.max(1, totalPages - 2); endPage = totalPages; }
+        } else { startPage = 1; endPage = totalPages; }
         if (startPage > 1) {
             osPaginationControls.appendChild(createPageItem(1, '1'));
             if (startPage > 2) osPaginationControls.appendChild(createPageItem(0, '...', false, true));
         }
-
         for (let i = startPage; i <= endPage; i++) {
             osPaginationControls.appendChild(createPageItem(i, i.toString(), i === currentPage));
         }
-
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) osPaginationControls.appendChild(createPageItem(0, '...', false, true));
             osPaginationControls.appendChild(createPageItem(totalPages, totalPages.toString()));
         }
-        
         osPaginationControls.appendChild(createPageItem(currentPage + 1, 'Próximo', false, currentPage === totalPages));
     }
 
     async function loadOsForEditing(osIdValue) {
         if (!osIdValue || (typeof window.electronAPI?.getOsById !== 'function')) {
-            showToast('ID da OS inválido ou API não disponível.', 'warning');
-            return;
+            showToast('ID da OS inválido ou API não disponível.', 'warning'); return;
         }
         try {
             const result = await window.electronAPI.getOsById(osIdValue); 
-            console.log("[Renderer OS] Resultado de getOsById:", JSON.stringify(result, null, 2)); // DEBUG
+            console.log("[Renderer OS - loadOsForEditing] Resultado de getOsById:", JSON.stringify(result, null, 2));
 
             if (!result || !result.success || !result.data) {
-                showToast(result?.message || 'OS não encontrada para edição.', 'warning');
-                return;
+                showToast(result?.message || 'OS não encontrada para edição.', 'warning'); return;
             }
             const os = result.data;
 
             await initializeNewOsForm(); 
             if(osForm) osForm.classList.remove('was-validated');
 
-            if(osIdField) osIdField.value = os._id || ''; // Fallback para string vazia
+            if(osIdField) osIdField.value = os._id ? os._id.toString() : '';
             if(osNumberField) osNumberField.value = os.osNumber || '';
             if(entryDateField) entryDateField.value = os.entryDate ? (new Date(os.entryDate).toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}) + ' ' + new Date(os.entryDate).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})) : '';
             if(statusOsField) statusOsField.value = os.status || 'Aberta';
 
             if (os.clientId) {
                  if (typeof window.electronAPI?.getClientById === 'function') {
-                    const clientResult = await window.electronAPI.getClientById(os.clientId.toString()); // Garante que é string
-                    console.log("[Renderer OS] Resultado de getClientById para OS:", JSON.stringify(clientResult, null, 2)); // DEBUG
+                    const clientResult = await window.electronAPI.getClientById(os.clientId.toString());
+                    console.log("[Renderer OS - loadOsForEditing] Resultado de getClientById para OS:", JSON.stringify(clientResult, null, 2));
                     if(clientResult && clientResult.success && clientResult.data) {
                         selectClient(clientResult.data);
                         if(searchClientInput) searchClientInput.value = clientResult.data.name || ''; 
                     } else { 
                         clearSelectedClient();
-                        if(selectedClientInfoDiv) selectedClientInfoDiv.innerHTML = `<span class="text-danger">Cliente associado (ID: ${os.clientId}) não encontrado.</span>`;
+                        if(selectedClientInfoDiv) selectedClientInfoDiv.innerHTML = `<span class="text-danger">Cliente (ID: ${os.clientId}) não encontrado.</span>`;
                         showToast(clientResult?.message || `Cliente com ID ${os.clientId} não encontrado.`, 'warning');
                     }
-                 } else {
-                     showToast('API de busca de cliente não disponível.', 'danger');
-                 }
-            } else {
-                clearSelectedClient();
-            }
+                 } else { showToast('API de busca de cliente não disponível.', 'danger'); }
+            } else { clearSelectedClient(); }
 
             if(equipmentField) equipmentField.value = os.equipment || '';
             if(accessoriesField) accessoriesField.value = os.accessories || '';
             if(reportedIssueField) reportedIssueField.value = os.reportedIssue || '';
             if(technicianNotesField) technicianNotesField.value = os.technicianNotes || '';
             if(servicePerformedField) servicePerformedField.value = os.servicePerformed || '';
-
             if(partsContainer) partsContainer.innerHTML = ''; 
             (os.parts || []).forEach(part => addPartRow(part));
-            
             if(laborCostField) laborCostField.value = parseFloat(os.laborCost || 0).toFixed(2);
             if(otherCostsField) otherCostsField.value = parseFloat(os.otherCosts || 0).toFixed(2);
             calculateTotalCost(); 
 
             if(saveOsButton) {
-                saveOsButton.innerHTML = `<i class="bi bi-arrow-clockwise"></i> Atualizar OS`;
+                saveOsButton.innerHTML = `<i data-feather="arrow-clockwise" class="icon-btn"></i> Atualizar OS`;
                 saveOsButton.disabled = false;
             }
             if(deleteOsButton) deleteOsButton.classList.remove('d-none');
             showToast('OS carregada para edição.', 'info');
+            if (typeof feather !== 'undefined' && feather.replace) feather.replace(); // Ícones no botão
             if (typeof window.scrollTo === 'function') window.scrollTo({ top: 0, behavior: 'smooth' }); 
         } catch (error) {
             console.error("Erro catastrófico ao carregar OS para edição:", error);
@@ -886,44 +843,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return colors[status] || 'light';
     }
     
-    // Idealmente, estas funções viriam de um arquivo utilitário compartilhado
-    function formatarCPF(cpf) {
-        if (!cpf) return '';
-        const cpfLimpo = cpf.toString().replace(/\D/g, '');
-        if (cpfLimpo.length > 11) cpfLimpo = cpfLimpo.substring(0,11); // Evita formatação incorreta
-
-        if (cpfLimpo.length <= 3) return cpfLimpo;
-        if (cpfLimpo.length <= 6) return cpfLimpo.replace(/(\d{3})(\d+)/, '$1.$2');
-        if (cpfLimpo.length <= 9) return cpfLimpo.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
-        return cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-    }
-
-    function formatarTelefone(tel) {
-        if (!tel) return '';
-        const telLimpo = tel.toString().replace(/\D/g, '');
-        if (telLimpo.length === 11) return `(${telLimpo.substring(0,2)}) ${telLimpo.substring(2,7)}-${telLimpo.substring(7,11)}`;
-        if (telLimpo.length === 10) return `(${telLimpo.substring(0,2)}) ${telLimpo.substring(2,6)}-${telLimpo.substring(6,10)}`;
-        return telLimpo; // Retorna limpo se não bater nos formatos
-    }
-
     // --- Inicialização ---
     if (osForm) {
         initializeNewOsForm(); 
         loadOsListWithCurrentFilters(); 
     } else {
-        console.warn("Formulário OS (osForm) não foi encontrado no DOM. A página de OS pode não funcionar corretamente.");
+        console.warn("Formulário OS (osForm) não encontrado no DOM.");
     }
 
-    
-    if (typeof feather !== 'undefined' && feather && typeof feather.replace === 'function') {
-        try {
-            feather.replace();
-            console.log("Feather Icons inicializados em OS Page.");
-        } catch(e) {
-            console.error("Erro ao renderizar Feather Icons na carga inicial (renderer_os.js):", e);
-        }
-    } else {
-        console.warn("Biblioteca Feather Icons (feather) não carregada ou 'replace' não é uma função (renderer_os.js).");
-    }
+    if (typeof feather !== 'undefined' && feather.replace) {
+        try { feather.replace(); } catch(e) { console.error("Erro Feather Icons (final):", e); }
+    } else { console.warn("Feather Icons não carregado (final)."); }
 
+    // --- Geração de Relatórios (IPC) ---
+    const { ipcRenderer } = window.electronAPI || {};
+    const reportButton = document.getElementById('generateReportButton');
+    if (reportButton && ipcRenderer) {
+        reportButton.addEventListener('click', () => {
+            const reportType = document.getElementById('reportTypeSelect')?.value || 'os';
+            ipcRenderer.send('trigger-generate-report', reportType);
+        });
+    }
 });

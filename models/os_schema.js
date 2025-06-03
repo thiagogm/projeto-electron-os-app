@@ -177,7 +177,6 @@ osSchema.pre('save', function(next) {
 });
 
 // Índices para otimização de consultas
-// A linha "osSchema.index({ osNumber: 1 }, { unique: true });" foi removida pois 'unique: true' no campo osNumber já cria o índice.
 osSchema.index({ status: 1, entryDate: -1 }); 
 osSchema.index({ clientId: 1 });
 

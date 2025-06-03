@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://viacep.com.br; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net;">
-    <title>Ordens de Serviço - Sistema OS</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://viacep.com.br; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net https://unpkg.com;">
+    <title>Ordens de Serviço - VoltDesk</title>
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
@@ -19,15 +19,12 @@
                 </div>
                 <div class="col-md-6 text-md-end mt-2 mt-md-0">
                     <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goHomeNav">
-                        <i class="bi bi-house-door"></i> Início
+                        <i data-feather="home" class="icon-nav"></i> Início
                     </button>
                     <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goToClientesPage">
-                        <i class="bi bi-people"></i> Cadastro de Clientes
+                        <i data-feather="users" class="icon-nav"></i> Cadastro de Clientes
                     </button>
-                    <button type="button" class="btn btn-primary nav-btn-header" id="goToOsPage" disabled>
-                        <i class="bi bi-file-earmark-text"></i> Ordens de Serviço
-                    </button>
-                </div>
+                    </div>
             </div>
         </div>
     </header>
@@ -123,7 +120,7 @@
                         <div id="partsContainer" class="mb-2">
                             </div>
                         <button type="button" class="btn btn-sm btn-outline-primary mb-3" id="addPartButton">
-                            <i class="bi bi-plus-circle"></i> Adicionar Peça
+                            <i data-feather="plus-circle" class="icon-btn-sm"></i> Adicionar Peça
                         </button>
                         
                         <div class="row">
@@ -149,26 +146,26 @@
             <div id="osFormFeedbackGlobal" class="alert d-none mt-3" role="alert"></div>
             <div class="form-actions text-center mt-4 pt-3 border-top">
                 <button type="submit" class="btn btn-success btn-lg me-2" id="saveOsButton">
-                    <i class="bi bi-check-lg"></i> Salvar OS
+                    <i data-feather="check-circle" class="icon-btn"></i> Salvar OS
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-lg me-2" id="clearOsFormButton">
-                    <i class="bi bi-eraser"></i> Nova / Limpar
+                    <i data-feather="eraser" class="icon-btn"></i> Nova / Limpar
                 </button>
                 <button type="button" class="btn btn-outline-danger btn-lg d-none" id="deleteOsButton">
-                    <i class="bi bi-trash"></i> Excluir OS
+                    <i data-feather="trash-2" class="icon-btn"></i> Excluir OS
                 </button>
             </div>
         </form>
-        <hr class="my-5">
+        <hr class="my-5"> 
 
         <div class="os-list-section">
             <h3 class="mb-3">Ordens de Serviço Cadastradas</h3>
             <div class="row mb-3 align-items-end">
-                 <div class="col-md-4">
+                 <div class="col-md-5"> 
                     <label for="searchOsInput" class="form-label">Buscar OS (Nº, Cliente, Equip.)</label>
                     <input type="text" class="form-control" id="searchOsInput" placeholder="Digite para buscar...">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4"> 
                     <label for="filterStatus" class="form-label">Filtrar por Status</label>
                     <select id="filterStatus" class="form-select">
                         <option value="">Todos</option>
@@ -182,7 +179,7 @@
                         <option value="Entregue">Entregue</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3"> 
                     <label for="osPerPageSelect" class="form-label">Itens por pág.</label>
                     <select id="osPerPageSelect" class="form-select">
                         <option value="5">5</option>
@@ -191,11 +188,7 @@
                         <option value="50">50</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <button type="button" class="btn btn-primary w-100" id="applyOsFiltersButton">
-                        <i class="bi bi-funnel"></i> Aplicar Filtros / Buscar
-                    </button>
-                </div>
+               
             </div>
             <div class="table-responsive">
                 <table class="table table-striped table-hover table-bordered">
@@ -221,7 +214,7 @@
         </div>
     </main>
 
-   <footer class="app-footer fixed-bottom py-2 mt-4 small">
+    <footer class="app-footer fixed-bottom py-2 mt-4 small">
         <div class="container-fluid px-md-4 d-flex justify-content-between align-items-center">
             <div id="copyrightText">
                 &copy; <span id="currentYear"></span> VoltDesk. Todos os direitos reservados.
@@ -245,8 +238,9 @@
     </div>
 
     <script src="../assets/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/cpf_validator.js"></script>
-    <script src="../assets/js/email_validator.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="../assets/js/cpf_validator.js"></script> 
+    <script src="../assets/js/email_validator.js"></script> 
     <script src="../assets/js/renderer_os.js"></script>
-</body>
+    </body>
 </html>

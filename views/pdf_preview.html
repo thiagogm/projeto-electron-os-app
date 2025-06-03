@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 
+        CSP para a página de pré-visualização:
+        default-src 'self': Padrão, permite apenas da mesma origem.
+        script-src 'self': Permite scripts locais (renderer_preview.js, bootstrap.bundle.min.js).
+        style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net: Permite CSS local, estilos inline, e CSS do Bootstrap Icons CDN.
+        object-src 'self' file:: ESSENCIAL! Permite que a tag <embed> carregue arquivos PDF locais (usando o protocolo file://).
+        img-src 'self' data:: Permite imagens locais e data URIs.
+        font-src 'self' https://cdn.jsdelivr.net: Permite fontes locais e da CDN do Bootstrap Icons.
+        connect-src 'self': Permite conexões para a mesma origem (para IPC).
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; object-src 'self' file:; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self';">
+    <title>Pré-visualização do Relatório - VoltDesk</title>
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+        .preview-header {
+            padding: 0.75rem 1rem;
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .preview-header .btn {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .preview-header .btn i {
+            margin-right: 0.35rem;
+            vertical-align: text-bottom;
+        }
+        .preview-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+        }
+        .pdf-viewer-container {
+            flex-grow: 1;
+            overflow: hidden;
+            background-color: #525659;
+        }
+        #pdfEmbed {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .status-message-preview {
+            font-size: 0.85rem;
+            color: #495057;
+            margin: 0 1rem;
+            text-align: center;
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-header">
+        <div class="controls-left">
+            <button class="btn btn-success btn-sm" id="savePdfButton" title="Salvar PDF no seu computador">
+                <i class="bi bi-download"></i> Salvar PDF
+            </button>
+            <button class="btn btn-info btn-sm ms-2" id="printPdfButton" title="Enviar para impressão">
+                <i class="bi bi-printer"></i> Imprimir
+            </button>
+        </div>
+        <div class="status-message-preview" id="previewStatusMessage">
+            Pré-visualização do Relatório
+        </div>
+        <div class="controls-right">
+            <button class="btn btn-outline-danger btn-sm" id="closePreviewButton" title="Fechar esta janela de pré-visualização">
+                <i class="bi bi-x-lg"></i> Fechar
+            </button>
+        </div>
+    </div>
+
+    <div class="pdf-viewer-container">
+        <embed id="pdfEmbed" type="application/pdf" src="">
+    </div>
+
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/renderer_preview.js"></script>
+</body>
+</html>
