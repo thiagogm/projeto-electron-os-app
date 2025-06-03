@@ -31,12 +31,7 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1366,
         height: 768,
-        webPreferences: {
-            preload: path.join(__dirname, 'preload.js'),
-            contextIsolation: true,
-            nodeIntegration: false,
-            enableRemoteModule: false
-        },
+        webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true },
         icon: path.join(__dirname, 'assets/icons/app_logo_grande.png')
     });
 
@@ -354,6 +349,10 @@ ipcMain.on('notify-close-pdf-preview', (event) => {
     if (previewWin && !previewWin.isDestroyed()) {
         previewWin.close();
     }
+});
+
+ipcMain.on('open-external-from-ui', (event, url) => {
+    shell.openExternal(url);
 });
 
 // --- CRUD Ordens de Serviço (OS) ---
