@@ -33,15 +33,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Utilitários
     fetchCep: (cep) => ipcRenderer.invoke('fetch-cep', cep),
 
-    // Relatórios PDF
-    triggerGenerateReport: (reportType) => ipcRenderer.send('trigger-generate-report', reportType),
-    onReportGenerated: (callback) => {
-        const listener = (_event, result) => callback(result);
-        ipcRenderer.on('report-generated', listener);
-        return () => ipcRenderer.removeListener('report-generated', listener); // Cleanup
-    },
-    onTriggerGenerateReport: (callback) => ipcRenderer.on('trigger-generate-report', (event, reportType) => callback(reportType)),
-
     // Ações Gerais do Electron (se chamadas pela UI)
     quitApp: () => ipcRenderer.send('quit-app-from-ui'),
     reloadWindow: () => ipcRenderer.send('reload-window-from-ui'),
@@ -52,4 +43,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // getSettings: () => ipcRenderer.invoke('get-settings'),
     // saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
     invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
+
+    // Relatórios PDF via jsPDF
+    generateClientReport: () => ipcRenderer.invoke('generate-client-report'),
+    generateOsFinalizadasReport: () => ipcRenderer.invoke('generate-os-finalizadas-report'),
+    generateOsAbertasReport: () => ipcRenderer.invoke('generate-os-abertas-report'),
 });

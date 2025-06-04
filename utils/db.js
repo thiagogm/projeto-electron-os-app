@@ -148,12 +148,25 @@ function notifySubscribers(isConnected) {
     });
 }
 
+// Atualiza o valor do contador para "osNumber" para 15 (ou o maior número encontrado)
+async function updateOsNumberCounter() {
+    const db = await connectDB();
+    const result = await db.collection('counters').updateOne(
+        { _id: "osNumber" },
+        { $set: { sequence_value: 15 } }, // coloque aqui o maior número encontrado
+        { upsert: true }
+    );
+    console.log('Contador osNumber atualizado:', result);
+}
+
+
 module.exports = {
     connectDB,
     disconnectDB,
     getMongooseInstance,
     ObjectId: mongoose.Types.ObjectId, // Exporta ObjectId do Mongoose para consistência
-    subscribeToConnectionStatus
+    subscribeToConnectionStatus,
+    updateOsNumberCounter // Exporta a função para atualização do contador
     // Não exportamos mais 'getDB' nos moldes antigos.
     // Se for absolutamente necessário o objeto 'db' nativo, ele é retornado por connectDB()
     // ou acessível via mongoose.connection.db após a conexão.

@@ -486,10 +486,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    if(clearFormButton) clearFormButton.addEventListener('click', clearForm);
+    if(clearFormButton) clearFormButton.addEventListener('click', () => clearForm(true));
     if(deleteButton) deleteButton.addEventListener('click', handleDeleteClient);
 
-    function clearForm() {
+    function clearForm(focusName = false) {
         clientForm?.reset();
         clientForm?.classList.remove('was-validated');
         if(clientIdField) clientIdField.value = '';
@@ -508,10 +508,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         if (globalFormFeedbackEl) displayGlobalFeedback('', 'd-none'); 
         
-        if(nameField) nameField.focus();
+        // Não foca automaticamente o campo nome ao editar um cliente
         if(searchResultsContainer) searchResultsContainer.innerHTML = '';
         if(searchInput) searchInput.value = '';
         cepBuscadoRecentemente = ''; 
+        if(nameField && focusName) nameField.focus();
     }
 
     function displayGlobalFeedback(message, type) {
@@ -668,11 +669,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     field.classList.remove('is-invalid', 'is-valid');
                 });
                 // Força validação no blur para mostrar 'is-valid' nos campos preenchidos
-                [nameField, cpfField, phoneField, emailField, cepField].forEach(f => f?.dispatchEvent(new Event('blur', { bubbles: true })));
+                [nameField, cpfField, phoneField, emailField, cepField].forEach(f => {
+                    if (f && f.value && f.value.trim().length > 0) {
+                        f.dispatchEvent(new Event('blur', { bubbles: true }));
+                    } else {
+                        f?.classList.remove('is-invalid', 'is-valid');
+                        const feedbackDiv = f?.nextElementSibling;
+                        if (feedbackDiv && feedbackDiv.classList.contains('invalid-feedback')) {
+                            feedbackDiv.style.display = 'none';
+                        }
+                    }
+                });
 
 
                 showToast('Cliente carregado para edição.', 'info');
-                if(nameField) nameField.focus();
+                // Não foca automaticamente o campo nome ao editar um cliente
                 if (typeof window.scrollTo === 'function') window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 showToast(result?.message || 'Cliente não encontrado ou falha ao carregar.', 'warning');
@@ -690,7 +701,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Inicialização ---
     if (clientForm) {
-        clearForm(); 
+        clearForm(false); // Não foca o campo nome ao carregar a tela
     } else {
         console.warn("Formulário de cliente (clientForm) não encontrado no DOM.");
     }
@@ -706,63 +717,45 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn("Biblioteca Feather Icons (feather) não carregada (cliente).");
     }
 
-    // --- Geração de Relatórios ---
-    const reportTypeSelect = document.getElementById('reportType');
-    const generateReportButton = document.getElementById('generateReportButton');
-    const reportResultsContainer = document.getElementById('reportResults');
-
-    if (generateReportButton) {
-        generateReportButton.addEventListener('click', async () => {
-            const reportType = reportTypeSelect.value;
-            if (!reportType) {
-                return showToast('Selecione um tipo de relatório para gerar.', 'warning');
-            }
-            // Desabilita o botão e mostra carregando
-            generateReportButton.disabled = true;
-            generateReportButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Gerando...`;
-
-            try {
-                if (!window.electronAPI || typeof window.electronAPI.generateReport !== 'function') {
-                    showToast('API de geração de relatórios não disponível.', 'danger');
-                    return;
-                }
-                // Chama a função de geração de relatório da API
-                const result = await window.electronAPI.generateReport(reportType);
-                console.log("Resultado da geração de relatório:", result);
-
+    const btnClientes = document.getElementById('btnRelatorioClientes');
+    if (btnClientes) {
+        btnClientes.addEventListener('click', async () => {
+            if (window.electronAPI && window.electronAPI.generateClientReport) {
+                const result = await window.electronAPI.generateClientReport();
                 if (result && result.success) {
-                    showToast('Relatório gerado com sucesso!', 'success');
-                    // Aqui você pode querer fazer o download automático do relatório ou abrir em uma nova aba, dependendo da sua lógica
-                    // Exemplo para download automático:
-                    const a = document.createElement('a');
-                    a.href = result.filePath; // Supondo que result.filePath tenha o caminho do arquivo gerado
-                    a.download = `relatorio_${reportType}_${new Date().toISOString().slice(0,10)}.xlsx`; // Nome do arquivo
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
+                    showToast('Relatório de clientes gerado com sucesso!', 'success');
                 } else {
-                    showToast(result?.message || 'Erro desconhecido ao gerar relatório.', 'danger');
+                    showToast('Erro ao gerar relatório: ' + (result?.error || 'Erro desconhecido'), 'danger');
                 }
-            } catch (error) {
-                console.error('Erro ao gerar relatório:', error);
-                showToast(`Erro crítico ao gerar relatório: ${error.message || error}`, 'danger');
-            } finally {
-                // Reabilita o botão
-                generateReportButton.disabled = false;
-                generateReportButton.innerHTML = 'Gerar Relatório';
             }
         });
     }
-    
-    // --- IPC Main Listeners (para comunicação com o processo principal) ---
-    const { ipcRenderer } = window.electronAPI || {};
-    if (ipcRenderer) {
-        ipcRenderer.on('report-generated', (event, arg) => {
-            console.log("Evento 'report-generated' recebido:", arg);
-            // Aqui você pode implementar a lógica para lidar com o evento de relatório gerado, se necessário
-            // Por exemplo, mostrar uma notificação ou atualizar uma lista de relatórios disponíveis para download
+
+    const btnFinalizadas = document.getElementById('btnRelatorioOsFinalizadas');
+    if (btnFinalizadas) {
+        btnFinalizadas.addEventListener('click', async () => {
+            if (window.electronAPI && window.electronAPI.generateOsFinalizadasReport) {
+                const result = await window.electronAPI.generateOsFinalizadasReport();
+                if (result && result.success) {
+                    showToast('Relatório de OS Finalizadas gerado com sucesso!', 'success');
+                } else {
+                    showToast('Erro ao gerar relatório: ' + (result?.error || 'Erro desconhecido'), 'danger');
+                }
+            }
         });
-    } else {
-        console.warn("ipcRenderer não disponível. Comunicação com o processo principal pode não funcionar.");
+    }
+
+    const btnAbertas = document.getElementById('btnRelatorioOsAbertas');
+    if (btnAbertas) {
+        btnAbertas.addEventListener('click', async () => {
+            if (window.electronAPI && window.electronAPI.generateOsAbertasReport) {
+                const result = await window.electronAPI.generateOsAbertasReport();
+                if (result && result.success) {
+                    showToast('Relatório de OS Abertas gerado com sucesso!', 'success');
+                } else {
+                    showToast('Erro ao gerar relatório: ' + (result?.error || 'Erro desconhecido'), 'danger');
+                }
+            }
+        });
     }
 });

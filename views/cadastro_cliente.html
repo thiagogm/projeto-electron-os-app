@@ -12,32 +12,38 @@
 <body class="body-form-page">
 
     <header class="page-header sticky-top">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <h2 class="page-title">Cadastro de Clientes</h2>
-                </div>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="searchInput" placeholder="Buscar Cliente (Nome ou CPF)...">
-                        <button type="button" class="btn btn-primary" id="searchButton" aria-label="Buscar cliente">
-                            <i data-feather="search" class="icon-nav"></i> <span class="d-none d-md-inline">Buscar</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="col-md-4 text-md-end mt-2 mt-md-0">
-                    <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goHomeNav">
-                        <i data-feather="home" class="icon-nav"></i> Início
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goToOsPage">
-                        <i data-feather="file-text" class="icon-nav"></i> Ordens de Serviço
-                    </button>
-                    </div>
+    <div class="logo-container text-center my-3">
+        <img src="../assets/icons/Logo-VoltDesk.png" alt="Logo VoltDesk" class="logo-voltdesk" style="max-width: 150px; height: auto;">
+    </div>
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <h2 class="page-title">Cadastro de Clientes</h2>
             </div>
-            <div id="searchResults" class="list-group mt-2 search-results-absolute" style="max-height: 200px; overflow-y: auto;">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Buscar Cliente (Nome ou CPF)...">
+                    <button type="button" class="btn btn-primary" id="searchButton" aria-label="Buscar cliente">
+                        <i data-feather="search" class="icon-nav"></i> <span class="d-none d-md-inline">Buscar</span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end mt-2 mt-md-0 d-flex justify-content-md-end gap-2">
+                <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goHomeNav">
+                    <i data-feather="home" class="icon-nav"></i> Início
+                </button>
+                <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goToOsPage">
+                    <i data-feather="file-text" class="icon-nav"></i> Ordens de Serviço
+                </button>
+                <button type="button" class="btn btn-outline-primary nav-btn-header" id="btnRelatorioClientes">
+                    <i data-feather="users"></i> Relatório de Clientes
+                </button>
                 </div>
         </div>
-    </header>
+        <div id="searchResults" class="list-group mt-2 search-results-absolute" style="max-height: 200px; overflow-y: auto;">
+            </div>
+    </div>
+</header>
 
     <main class="container-fluid form-container-main">
         <p class="text-instructions mb-3">Preencha os campos obrigatórios <span class="text-danger">*</span></p>
@@ -125,13 +131,14 @@
                     <i data-feather="check-circle" class="icon-btn"></i> Salvar Cliente
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-lg me-2" id="clearFormButton">
-                    <i data-feather="eraser" class="icon-btn"></i> Limpar
+                    <i data-feather="rotate-ccw" class="icon-btn"></i> Limpar
                 </button>
                 <button type="button" class="btn btn-outline-danger btn-lg d-none" id="deleteButton">
                     <i data-feather="trash-2" class="icon-btn"></i> Excluir
                 </button>
             </div>
         </form>
+        
         <p class="text-instructions mt-2 text-center"><small><span class="text-danger">*</span> Campos obrigatórios</small></p>
     </main>
 

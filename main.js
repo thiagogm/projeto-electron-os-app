@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const mongoose = require('mongoose');
+const { jsPDF } = require('jspdf');
 
 // Modelos Mongoose
 const Client = require('./Models/client_schema.js');
@@ -14,8 +15,6 @@ const { connectDB, disconnectDB, ObjectId, subscribeToConnectionStatus } = requi
 
 let mainWindow;
 let dbConnectionStatus = false;
-let pdfPreviewWindow = null;
-let tempPdfPathStore = {};
 
 function navigateToPage(pagePath) {
     if (mainWindow && !mainWindow.isDestroyed()) {
@@ -107,9 +106,9 @@ const menuTemplate = [
     {
         label: 'Relatórios',
         submenu: [
-            { label: 'Clientes', click: () => mainWindow?.webContents.send('trigger-generate-report', 'clients') },
-            { label: 'OS Abertas', click: () => mainWindow?.webContents.send('trigger-generate-report', 'osAbertas') },
-            { label: 'OS Finalizadas', click: () => mainWindow?.webContents.send('trigger-generate-report', 'osFinalizadas') }
+            { label: 'Clientes', click: () => mainWindow?.webContents.send('btnRelatorioClientes') },
+            { label: 'OS Abertas', click: () => mainWindow?.webContents.send('btnRelatorioOsAbertas') },
+            { label: 'OS Finalizadas', click: () => mainWindow?.webContents.send('btnRelatorioOsFinalizadas') }
         ]
     },
     {
@@ -162,198 +161,30 @@ ipcMain.on('navigate-to', (event, pageFile) => {
 ipcMain.handle('get-initial-db-status', async () => ({ connected: dbConnectionStatus }));
 
 async function getNextOsNumberFromDB_Native() {
-    if (!dbConnectionStatus) {
-        console.warn("[getNextOsNumber] Conexão Mongoose não estabelecida.");
-        return 'OS-FBK-CONN-00001';
-    }
-    const db = mongoose.connection.db;
-    if (!db) {
-        console.warn("[getNextOsNumber] Instância DB nativa não disponível via Mongoose.");
-        return 'OS-FBK-DB-00001';
-    }
     try {
-        const counterCollection = db.collection('counters');
-        const counterName = 'osNumber';
-        const result = await counterCollection.findOneAndUpdate(
-            { _id: counterName }, { $inc: { sequence_value: 1 } },
-            { returnDocument: 'after', upsert: true }
+        const counter = await mongoose.connection.collection('counters').findOneAndUpdate(
+            { _id: "osNumber" },
+            { $inc: { sequence_value: 1 } },
+            { upsert: true, returnDocument: "after" }
         );
-        const nextVal = result?.value?.sequence_value ?? 1;  
-        const formattedOsNumber = `OS-${String(nextVal).padStart(5, '0')}`;
-        console.log(`[getNextOsNumber] Próximo número da OS gerado: ${formattedOsNumber}`);
-        return formattedOsNumber;
+        // Compatibilidade máxima com diferentes versões do driver
+        let nextNumber = 1;
+        if (counter && counter.value && typeof counter.value.sequence_value === 'number') {
+            nextNumber = counter.value.sequence_value;
+        } else if (counter && counter.lastErrorObject && counter.lastErrorObject.value && typeof counter.lastErrorObject.value.sequence_value === 'number') {
+            nextNumber = counter.lastErrorObject.value.sequence_value;
+        } else if (counter && typeof counter.sequence_value === 'number') {
+            nextNumber = counter.sequence_value;
+        }
+        const osNumber = `OS-${nextNumber.toString().padStart(5, '0')}`;
+        console.log(`[getNextOsNumber] Próximo número da OS gerado: ${osNumber}`);
+        return osNumber;
     } catch (error) {
-        console.error("Erro crítico ao gerar próximo número de OS:", error);
+        console.error('[getNextOsNumber] Erro ao gerar número da OS:', error);
         return `OS-ERR-DB-${Date.now().toString().slice(-3)}`;
     }
 }
 ipcMain.handle('get-next-os-number', getNextOsNumberFromDB_Native);
-
-ipcMain.on('trigger-generate-report', async (event, reportType) => {
-    if (!dbConnectionStatus) {
-        mainWindow?.webContents.send('report-generated', { success: false, error: 'Banco de dados não conectado.', reportType, action: 'generate' });
-        return;
-    }
-    if (pdfPreviewWindow && !pdfPreviewWindow.isDestroyed()) {
-        pdfPreviewWindow.focus();
-        mainWindow?.webContents.send('report-generated', { success: false, error: 'Uma janela de pré-visualização já está aberta.', reportType, action: 'generate_busy' });
-        return;
-    }
-
-    let htmlContent = '';
-    let reportTitle = '';
-    let defaultFileNameSuggestion = `Relatorio_${reportType}_${new Date().toISOString().slice(0,10)}.pdf`;
-
-    try {
-        console.log(`[Main] Gerando dados para relatório: ${reportType}`);
-        if (reportType === 'clients') {
-            reportTitle = 'Relatório de Clientes';
-            // Busca todos os clientes
-            const clients = await Client.find().sort({ name: 1 }).lean().exec();
-            if (!clients || clients.length === 0) throw new Error("Nenhum cliente encontrado para o relatório.");
-            htmlContent = generateClientsReportHTML(clients);
-        } else if (reportType === 'osAbertas') {
-            reportTitle = 'Ordens de Serviço Abertas/Em Andamento';
-            // Busca OS abertas/em andamento
-            const osAbertas = await ServiceOrder.find({ status: { $nin: ['Finalizada', 'Cancelada', 'Entregue'] } }).sort({ entryDate: -1 }).lean().exec();
-            if (!osAbertas || osAbertas.length === 0) throw new Error("Nenhuma OS aberta/em andamento encontrada.");
-            htmlContent = generateServiceOrdersReportHTML(osAbertas, reportTitle);
-        } else if (reportType === 'osFinalizadas') {
-            reportTitle = 'Ordens de Serviço Finalizadas/Entregues';
-            // Busca OS finalizadas/entregues
-            const osFinalizadas = await ServiceOrder.find({ status: { $in: ['Finalizada', 'Entregue'] } }).sort({ completionDate: -1, entryDate: -1 }).lean().exec();
-            if (!osFinalizadas || osFinalizadas.length === 0) throw new Error("Nenhuma OS finalizada/entregue encontrada.");
-            htmlContent = generateServiceOrdersReportHTML(osFinalizadas, reportTitle);
-        } else {
-            throw new Error('Tipo de relatório desconhecido.');
-        }
-
-        const tempDir = os.tmpdir(); // Usar os.tmpdir() para diretório temporário do sistema
-        const tempPdfPath = path.join(tempDir, `report-preview-${Date.now()}.pdf`);
-
-        const invisibleWin = new BrowserWindow({ show: false, webPreferences: { nodeIntegration: false, contextIsolation: true } }); // Adicionado contextIsolation
-
-        // É mais seguro usar uma promise para garantir que o conteúdo foi carregado
-        await new Promise((resolve, reject) => {
-            invisibleWin.webContents.on('did-finish-load', resolve);
-            invisibleWin.webContents.on('did-fail-load', (event, errorCode, errorDescription) => reject(new Error(errorDescription)));
-            invisibleWin.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(htmlContent)}`);
-        });
-
-        const pdfData = await invisibleWin.webContents.printToPDF({
-            printBackground: true,
-            pageSize: 'A4',
-            margins: { top: 0, bottom: 0, left: 0, right: 0 }
-        });
-        if (invisibleWin && !invisibleWin.isDestroyed()) invisibleWin.close();
-
-        fs.writeFileSync(tempPdfPath, pdfData);
-        console.log(`[Main] PDF temporário gerado em: ${tempPdfPath}`);
-
-        pdfPreviewWindow = new BrowserWindow({
-            width: 900, height: 700, title: `Pré-visualização: ${reportTitle}`,
-            parent: mainWindow, modal: false, 
-            webPreferences: {
-                preload: path.join(__dirname, 'preload_preview.js'),
-                contextIsolation: true, nodeIntegration: false,
-            },
-            icon: path.join(__dirname, 'assets/icons/app_logo_grande.png')
-        });
-
-        pdfPreviewWindow.loadFile(path.join(__dirname, 'views/pdf_preview.html'));
-
-        pdfPreviewWindow.webContents.on('did-finish-load', () => {
-            if (pdfPreviewWindow && !pdfPreviewWindow.isDestroyed()) {
-                pdfPreviewWindow.webContents.send('load-pdf-in-preview', tempPdfPath);
-            }
-        });
-
-        tempPdfPathStore[pdfPreviewWindow.id] = { path: tempPdfPath, type: reportType, title: reportTitle, defaultName: defaultFileNameSuggestion };
-
-        pdfPreviewWindow.on('closed', () => {
-            const previewWinId = pdfPreviewWindow?.id; // Captura o ID antes de setar para null
-            const storedInfo = tempPdfPathStore[previewWinId];
-            if (storedInfo && storedInfo.path) {
-                try {
-                    if (fs.existsSync(storedInfo.path)) {
-                        fs.unlinkSync(storedInfo.path);
-                        console.log(`[Main] PDF temporário deletado: ${storedInfo.path}`);
-                    }
-                } catch (e) { console.error(`[Main] Erro ao deletar PDF temporário ${storedInfo.path}:`, e); }
-                delete tempPdfPathStore[previewWinId];
-            }
-            if (mainWindow && !mainWindow.isDestroyed()) {
-                 mainWindow.webContents.send('report-generated', { 
-                    success: true, action: 'preview_closed', 
-                    reportType: storedInfo?.type || 'desconhecido' 
-                });
-            }
-            pdfPreviewWindow = null;
-        });
-    } catch (error) {
-        console.error(`[Main] Erro ao gerar relatório ${reportType}:`, error);
-        if (mainWindow && !mainWindow.isDestroyed()) {
-            mainWindow.webContents.send('report-generated', { success: false, error: error.message, reportType, action: 'generate' });
-        }
-    }
-});
-
-ipcMain.handle('request-save-pdf-from-preview', async (event) => {
-    const previewWin = BrowserWindow.fromWebContents(event.sender);
-    if (!previewWin) return { success: false, error: 'Janela de pré-visualização não encontrada.'};
-    const storedInfo = tempPdfPathStore[previewWin.id];
-
-    if (!storedInfo || !storedInfo.path || !fs.existsSync(storedInfo.path)) {
-        return { success: false, error: 'Arquivo PDF temporário não encontrado.' };
-    }
-    try {
-        const { canceled, filePath: chosenPath } = await dialog.showSaveDialog(previewWin, {
-            title: `Salvar ${storedInfo.title}`,
-            defaultPath: path.join(app.getPath('documents'), storedInfo.defaultName),
-            filters: [{ name: 'Arquivos PDF', extensions: ['pdf'] }]
-        });
-        if (!canceled && chosenPath) {
-            fs.copyFileSync(storedInfo.path, chosenPath);
-            console.log(`[Main] PDF salvo em: ${chosenPath}`);
-            previewWin.webContents.send('pdf-action-status', { action: 'save', success: true, filePath: chosenPath });
-            mainWindow?.webContents.send('report-generated', { success: true, action: 'saved', filePath: chosenPath, reportType: storedInfo.type });
-            return { success: true, filePath: chosenPath };
-        } else {
-            previewWin.webContents.send('pdf-action-status', { action: 'save', success: false, canceled: true });
-            return { success: false, canceled: true };
-        }
-    } catch (error) {
-        console.error(`[Main] Erro ao salvar PDF da pré-visualização:`, error);
-        previewWin.webContents.send('pdf-action-status', { action: 'save', success: false, error: error.message });
-        return { success: false, error: error.message };
-    }
-});
-
-ipcMain.on('request-print-pdf-from-preview', (event) => {
-    const previewWin = BrowserWindow.fromWebContents(event.sender);
-    if (previewWin && !previewWin.isDestroyed()) {
-        previewWin.webContents.print({}, (success, failureReason) => {
-            if (previewWin && !previewWin.isDestroyed()){ // Verifica novamente antes de enviar
-                if (success) {
-                    previewWin.webContents.send('pdf-action-status', { action: 'print', success: true });
-                } else {
-                    previewWin.webContents.send('pdf-action-status', { action: 'print', success: false, error: failureReason });
-                }
-            }
-        });
-    }
-});
-
-ipcMain.on('notify-close-pdf-preview', (event) => {
-    const previewWin = BrowserWindow.fromWebContents(event.sender);
-    if (previewWin && !previewWin.isDestroyed()) {
-        previewWin.close();
-    }
-});
-
-ipcMain.on('open-external-from-ui', (event, url) => {
-    shell.openExternal(url);
-});
 
 // --- CRUD Ordens de Serviço (OS) ---
 ipcMain.handle('add-os', async (event, osData) => {
@@ -366,12 +197,18 @@ ipcMain.handle('add-os', async (event, osData) => {
         if (!clientExists) {
             return { success: false, message: 'Cliente associado não encontrado.' };
         }
+
+        // Gere o número da OS aqui, SEMPRE pelo backend!
+        const osNumber = await getNextOsNumberFromDB_Native();
+
         const newOsPayload = {
             ...osData,
+            osNumber, // sobrescreve qualquer valor vindo do frontend
             clientName: osData.clientName || clientExists.name,
             clientCpf: osData.clientCpf || clientExists.cpf,
             clientPhone: osData.clientPhone || clientExists.phone
         };
+
         const serviceOrder = new ServiceOrder(newOsPayload);
         const savedOs = await serviceOrder.save();
         return { success: true, id: savedOs._id.toString(), osNumber: savedOs.osNumber, message: 'OS cadastrada!' };
@@ -396,7 +233,7 @@ ipcMain.handle('get-os-list-paginated', async (event, { page = 1, limit = 10, se
             const regex = new RegExp(searchTerm.replace(/[-[\]{}()\*+?.,\\^$|\#\\s]/g, '\\$&'), 'i');
             query.$or = [ { osNumber: { $regex: regex } }, { clientName: { $regex: regex } }, { equipment: { $regex: regex } } ];
         }
-        const osList = await ServiceOrder.find(query).sort({ entryDate: -1 }).skip(skip).limit(Number(limit)).lean().exec();
+        const osList = await ServiceOrder.find(query).sort({ osNumber: -1 }).skip(skip).limit(Number(limit)).lean().exec();
         const totalCount = await ServiceOrder.countDocuments(query).exec();
         const dataWithStringIds = osList.map(os => ({ ...os, _id: os._id.toString(), clientId: os.clientId?.toString() }));
         return { success: true, data: dataWithStringIds, totalCount };
@@ -628,6 +465,181 @@ ipcMain.handle('fetch-cep', async (event, cep) => {
     }
 });
 
+// Relatório de Clientes
+ipcMain.handle('generate-client-report', async () => {
+    try {
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const dataAtual = new Date().toLocaleDateString('pt-BR');
+        doc.setFontSize(10);
+        doc.text(`Data: ${dataAtual}`, 170, 15);
+        doc.setFontSize(18);
+        doc.text("Relatório de clientes", 15, 30);
+        doc.setFontSize(12);
+        let y = 50;
+        doc.text("Nome", 14, y);
+        doc.text("Telefone", 85, y);
+        doc.text("E-mail", 130, y);
+        y += 5;
+        doc.setLineWidth(0.5);
+        doc.line(10, y, 200, y);
+        y += 10;
+
+        const clientes = await Client.find().sort({ name: 1 });
+        clientes.forEach((c) => {
+            if (y > 280) {
+                doc.addPage();
+                y = 20;
+                doc.text("Nome", 14, y);
+                doc.text("Telefone", 85, y);
+                doc.text("E-mail", 130, y);
+                y += 5;
+                doc.setLineWidth(0.5);
+                doc.line(10, y, 200, y);
+                y += 10;
+            }
+            doc.text(c.name || '', 15, y);
+            doc.text(c.phone || '', 85, y);
+            doc.text(c.email || '', 130, y);
+            y += 10;
+        });
+
+        const pages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.text(`Página ${i} de ${pages}`, 105, 290, { align: 'center' });
+        }
+
+        const tempDir = app.getPath('temp');
+        const filePath = path.join(tempDir, 'clientes.pdf');
+        doc.save(filePath);
+        await shell.openPath(filePath);
+        return { success: true, filePath };
+    } catch (error) {
+        console.error(error);
+        return { success: false, error: error.message };
+    }
+});
+
+// Relatório de OS Finalizadas
+ipcMain.handle('generate-os-finalizadas-report', async () => {
+    try {
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const dataAtual = new Date().toLocaleDateString('pt-BR');
+        doc.setFontSize(10);
+        doc.text(`Data: ${dataAtual}`, 170, 15);
+        doc.setFontSize(18);
+        doc.text("Relatório de OS Finalizadas", 15, 30);
+        doc.setFontSize(12);
+        let y = 50;
+        doc.text("Nº OS", 14, y);
+        doc.text("Cliente", 40, y);
+        doc.text("Equipamento", 90, y);
+        doc.text("Total (R$)", 160, y);
+        y += 5;
+        doc.setLineWidth(0.5);
+        doc.line(10, y, 200, y);
+        y += 10;
+
+        const osList = await ServiceOrder.find({ status: 'Finalizada' }).sort({ osNumber: 1 });
+        osList.forEach((os) => {
+            if (y > 280) {
+                doc.addPage();
+                y = 20;
+                doc.text("Nº OS", 14, y);
+                doc.text("Cliente", 40, y);
+                doc.text("Equipamento", 90, y);
+                doc.text("Total (R$)", 160, y);
+                y += 5;
+                doc.setLineWidth(0.5);
+                doc.line(10, y, 200, y);
+                y += 10;
+            }
+            doc.text(String(os.osNumber || ''), 15, y);
+            doc.text(os.clientName || '', 40, y);
+            doc.text(os.equipment || '', 90, y);
+            doc.text((os.totalCost || 0).toFixed(2), 160, y);
+            y += 10;
+        });
+
+        const pages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.text(`Página ${i} de ${pages}`, 105, 290, { align: 'center' });
+        }
+
+        const tempDir = app.getPath('temp');
+        const filePath = path.join(tempDir, 'os_finalizadas.pdf');
+        doc.save(filePath);
+        await shell.openPath(filePath);
+        return { success: true, filePath };
+    } catch (error) {
+        console.error(error);
+        return { success: false, error: error.message };
+    }
+});
+
+// Relatório de OS Abertas
+ipcMain.handle('generate-os-abertas-report', async () => {
+    try {
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const dataAtual = new Date().toLocaleDateString('pt-BR');
+        doc.setFontSize(10);
+        doc.text(`Data: ${dataAtual}`, 170, 15);
+        doc.setFontSize(18);
+        doc.text("Relatório de OS Abertas", 15, 30);
+        doc.setFontSize(12);
+        let y = 50;
+        doc.text("Nº OS", 14, y);
+        doc.text("Cliente", 40, y);
+        doc.text("Equipamento", 90, y);
+        doc.text("Status", 160, y);
+        y += 5;
+        doc.setLineWidth(0.5);
+        doc.line(10, y, 200, y);
+        y += 10;
+
+        const osList = await ServiceOrder.find({ status: 'Aberta' }).sort({ osNumber: 1 });
+        osList.forEach((os) => {
+            if (y > 280) {
+                doc.addPage();
+                y = 20;
+                doc.text("Nº OS", 14, y);
+                doc.text("Cliente", 40, y);
+                doc.text("Equipamento", 90, y);
+                doc.text("Status", 160, y);
+                y += 5;
+                doc.setLineWidth(0.5);
+                doc.line(10, y, 200, y);
+                y += 10;
+            }
+            doc.text(String(os.osNumber || ''), 15, y);
+            doc.text(os.clientName || '', 40, y);
+            doc.text(os.equipment || '', 90, y);
+            doc.text(os.status || '', 160, y);
+            y += 10;
+        });
+
+        const pages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.text(`Página ${i} de ${pages}`, 105, 290, { align: 'center' });
+        }
+
+        const tempDir = app.getPath('temp');
+        const filePath = path.join(tempDir, `os_abertas_${Date.now()}.pdf`);
+        doc.save(filePath);
+        await shell.openPath(filePath);
+        return { success: true, filePath };
+    } catch (error) {
+        console.error(error);
+        return { success: false, error: error.message };
+    }
+});
+
+
 // --- Lógica App Electron ---
 app.whenReady().then(() => {
     const menu = Menu.buildFromTemplate(menuTemplate);
@@ -640,15 +652,6 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
-app.on('will-quit', async () => {
-    // Limpar PDFs temporários restantes
-    for (const winId in tempPdfPathStore) {
-        const info = tempPdfPathStore[winId];
-        if (info && info.path && fs.existsSync(info.path)) {
-            try { fs.unlinkSync(info.path); console.log(`[Main will-quit] PDF temp deletado: ${info.path}`); }
-            catch (e) { console.error(`[Main will-quit] Erro ao deletar PDF temp ${info.path}:`, e); }
-        }
-    }
-    await disconnectDB();
-});
+
+
 

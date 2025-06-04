@@ -14,17 +14,20 @@
     <header class="page-header sticky-top">
         <div class="container-fluid">
             <div class="row align-items-center">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <h2 class="page-title">Gerenciamento de Ordens de Serviço</h2>
                 </div>
-                <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                <div class="col-md-4">
+                    <!-- (Opcional: espaço para busca, se quiser padronizar) -->
+                </div>
+                <div class="col-md-4 d-flex justify-content-md-end gap-2">
                     <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goHomeNav">
                         <i data-feather="home" class="icon-nav"></i> Início
                     </button>
                     <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goToClientesPage">
                         <i data-feather="users" class="icon-nav"></i> Cadastro de Clientes
                     </button>
-                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -40,10 +43,6 @@
                     <fieldset class="form-section mb-3">
                         <legend class="form-section-legend">Informações da OS</legend>
                         <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="osNumber" class="form-label">Nº OS</label>
-                                <input type="text" class="form-control" id="osNumber" readonly>
-                            </div>
                             <div class="col-md-4 mb-3">
                                 <label for="entryDate" class="form-label">Data de Entrada</label>
                                 <input type="text" class="form-control" id="entryDate" readonly>
@@ -118,7 +117,27 @@
                     <fieldset class="form-section mb-3">
                         <legend class="form-section-legend">Peças e Custos</legend>
                         <div id="partsContainer" class="mb-2">
-                            </div>
+                            <div class="row g-2 align-items-end part-row">
+    <div class="col-12 col-md-4">
+        <label class="form-label mb-1" for="partName">Nome da peça</label>
+        <input type="text" class="form-control" id="partName" name="partName[]" placeholder="Ex: Placa-mãe" required>
+    </div>
+    <div class="col-6 col-md-3">
+        <label class="form-label mb-1" for="partQty">Qtd.</label>
+        <input type="number" class="form-control" id="partQty" name="partQty[]" min="1" placeholder="Qtd." required>
+    </div>
+    <div class="col-6 col-md-3">
+        <label class="form-label mb-1" for="partValue">Valor (R$)</label>
+        <input type="number" class="form-control" id="partValue" name="partValue[]" min="0" step="0.01" placeholder="Valor (R$)" required>
+    </div>
+    <div class="col-12 col-md-2 text-end">
+        <label class="form-label d-none d-md-block mb-1">&nbsp;</label>
+        <button type="button" class="btn btn-outline-danger btn-sm remove-part-btn mt-md-2" title="Remover peça">
+            <i data-feather="trash-2"></i>
+        </button>
+    </div>
+</div>
+                        </div>
                         <button type="button" class="btn btn-sm btn-outline-primary mb-3" id="addPartButton">
                             <i data-feather="plus-circle" class="icon-btn-sm"></i> Adicionar Peça
                         </button>
@@ -149,7 +168,7 @@
                     <i data-feather="check-circle" class="icon-btn"></i> Salvar OS
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-lg me-2" id="clearOsFormButton">
-                    <i data-feather="eraser" class="icon-btn"></i> Nova / Limpar
+                    <i data-feather="x-circle" class="icon-btn"></i> Nova / Limpar
                 </button>
                 <button type="button" class="btn btn-outline-danger btn-lg d-none" id="deleteOsButton">
                     <i data-feather="trash-2" class="icon-btn"></i> Excluir OS
@@ -211,6 +230,18 @@
                 <ul class="pagination justify-content-center mt-3" id="osPaginationControls">
                     </ul>
             </nav>
+        </div>
+
+        <div class="mb-3">
+            <button id="btnRelatorioClientes" class="btn btn-primary btn-lg me-2 os-report-btn">
+                <i data-feather="users"></i> Relatório de Clientes
+            </button>
+            <button id="btnRelatorioOsFinalizadas" class="btn btn-success btn-lg me-2 os-report-btn">
+                <i data-feather="check-circle"></i> Relatório OS Finalizadas
+            </button>
+            <button id="btnRelatorioOsAbertas" class="btn btn-warning btn-lg os-report-btn">
+                <i data-feather="alert-circle"></i> Relatório OS Abertas
+            </button>
         </div>
     </main>
 

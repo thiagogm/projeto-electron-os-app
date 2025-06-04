@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Seletores de Elementos do Formulário de OS ---
     const osForm = document.getElementById('osForm');
     const osIdField = document.getElementById('osId');
-    const osNumberField = document.getElementById('osNumber');
     const entryDateField = document.getElementById('entryDate');
     const statusOsField = document.getElementById('statusOs');
 
@@ -250,14 +249,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function selectClient(client) {
-        console.log("[Renderer OS - selectClient] Objeto client recebido:", client);
+        
         if (client && client._id) {
             const clientIdString = client._id.toString();
-            console.log("[Renderer OS - selectClient] ID do cliente (string):", clientIdString);
+            
             
             if (selectedClientIdField) {
                 selectedClientIdField.value = clientIdString;
-                console.log("[Renderer OS - selectClient] selectedClientIdField.value definido para:", selectedClientIdField.value);
+                
             }
             if (selectedClientInfoDiv) {
                 selectedClientInfoDiv.innerHTML = `<strong>${client.name || ''}</strong><br><small>CPF: ${formatarCPF(client.cpf || '')} | Tel: ${formatarTelefone(client.phone || '')}</small>`;
@@ -475,7 +474,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const clientIdForOs = selectedClientIdField?.value;
-            console.log("[Renderer OS - Submit] osData.clientId ANTES do envio:", clientIdForOs, "Tipo:", typeof clientIdForOs);
 
             if (!clientIdForOs || typeof clientIdForOs !== 'string' || !clientIdForOs.match(/^[0-9a-fA-F]{24}$/)) {
                 console.error("[Renderer OS - Submit] ERRO CRÍTICO: clientId para OS é inválido!", clientIdForOs);
@@ -503,23 +501,22 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const osData = {
-                osNumber: osNumberField?.value,
-                clientId: clientIdForOs, 
-                clientName: selectedClientInfoDiv?.querySelector('strong')?.textContent || 'N/A',
-                clientCpf: selectedClientInfoDiv?.querySelector('small')?.textContent.includes('CPF: ') ? selectedClientInfoDiv.querySelector('small').textContent.split('CPF: ')[1].split(' |')[0].replace(/\D/g,'') : '',
-                clientPhone: selectedClientInfoDiv?.querySelector('small')?.textContent.includes('Tel: ') ? selectedClientInfoDiv.querySelector('small').textContent.split('Tel: ')[1].replace(/\D/g,'') : '',
-                equipment: equipmentField?.value.trim(),
-                accessories: accessoriesField?.value.trim(),
-                reportedIssue: reportedIssueField?.value.trim(),
-                technicianNotes: technicianNotesField?.value.trim(),
-                servicePerformed: servicePerformedField?.value.trim(),
-                status: statusOsField?.value,
+                clientId: document.getElementById('selectedClientId').value,
+                equipment: document.getElementById('equipment').value,
+                accessories: document.getElementById('accessories').value,
+                reportedIssue: document.getElementById('reportedIssue').value,
+                technicianNotes: document.getElementById('technicianNotes').value,
+                servicePerformed: document.getElementById('servicePerformed').value,
+                status: document.getElementById('statusOs').value,
                 parts: partsData,
                 laborCost: parseFloat(laborCostField?.value || 0) || 0,
                 otherCosts: parseFloat(otherCostsField?.value || 0) || 0,
                 totalCost: parseFloat(totalCostField?.value || 0) || 0,
             };
             
+            // Garante que não vai nenhum osNumber
+            delete osData.osNumber;
+
             const currentOsId = osIdField?.value;
             let result;
 
@@ -588,19 +585,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (statusOsField) statusOsField.value = 'Aberta';
         if (entryDateField) entryDateField.value = new Date().toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}) + ' ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
         
-        try {
-            if (window.electronAPI && typeof window.electronAPI.getNextOsNumber === 'function') {
-                const nextNumber = await window.electronAPI.getNextOsNumber();
-                if (osNumberField) osNumberField.value = nextNumber;
-            } else if(osNumberField) {
-                 osNumberField.value = `OS-DEF${Date.now().toString().slice(-3)}`;
-                 if(!window.electronAPI || !window.electronAPI.getNextOsNumber) console.warn("electronAPI.getNextOsNumber não disponível.");
-            }
-        } catch (e) {
-            if (osNumberField) osNumberField.value = `OS-ERR${Date.now().toString().slice(-3)}`;
-            console.error("Erro ao buscar próximo número de OS", e);
-            showToast("Erro ao gerar número da OS.", "warning");
-        }
 
         if (saveOsButton) {
             saveOsButton.innerHTML = `<i data-feather="check-circle" class="icon-btn"></i> Salvar OS`;
@@ -682,7 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderOsPagination(0, limit, page); return;
             }
             const result = await window.electronAPI.getOsListPaginated({ page, limit, searchTerm, filters: { status } });
-            console.log("[Renderer OS - loadOsList] Resultado:", JSON.stringify(result, null, 2));
+            
 
             if (!result || typeof result.success === 'undefined') {
                 showToast('Resposta inválida do servidor.', 'danger');
@@ -779,8 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         try {
             const result = await window.electronAPI.getOsById(osIdValue); 
-            console.log("[Renderer OS - loadOsForEditing] Resultado de getOsById:", JSON.stringify(result, null, 2));
-
+            
             if (!result || !result.success || !result.data) {
                 showToast(result?.message || 'OS não encontrada para edição.', 'warning'); return;
             }
@@ -790,7 +773,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if(osForm) osForm.classList.remove('was-validated');
 
             if(osIdField) osIdField.value = os._id ? os._id.toString() : '';
-            if(osNumberField) osNumberField.value = os.osNumber || '';
             if(entryDateField) entryDateField.value = os.entryDate ? (new Date(os.entryDate).toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}) + ' ' + new Date(os.entryDate).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})) : '';
             if(statusOsField) statusOsField.value = os.status || 'Aberta';
 
@@ -855,13 +837,75 @@ document.addEventListener('DOMContentLoaded', () => {
         try { feather.replace(); } catch(e) { console.error("Erro Feather Icons (final):", e); }
     } else { console.warn("Feather Icons não carregado (final)."); }
 
-    // --- Geração de Relatórios (IPC) ---
-    const { ipcRenderer } = window.electronAPI || {};
-    const reportButton = document.getElementById('generateReportButton');
-    if (reportButton && ipcRenderer) {
-        reportButton.addEventListener('click', () => {
-            const reportType = document.getElementById('reportTypeSelect')?.value || 'os';
-            ipcRenderer.send('trigger-generate-report', reportType);
+    const btnClientes = document.getElementById('btnRelatorioClientes');
+    if (btnClientes) {
+        btnClientes.addEventListener('click', async () => {
+            if (window.electronAPI && window.electronAPI.generateClientReport) {
+                const result = await window.electronAPI.generateClientReport();
+                if (result && result.success) {
+                    showToast('Relatório de clientes gerado com sucesso!', 'success');
+                } else {
+                    showToast('Erro ao gerar relatório: ' + (result?.error || 'Erro desconhecido'), 'danger');
+                }
+            }
         });
     }
+
+    const btnFinalizadas = document.getElementById('btnRelatorioOsFinalizadas');
+    if (btnFinalizadas) {
+        btnFinalizadas.addEventListener('click', async () => {
+            if (window.electronAPI && window.electronAPI.generateOsFinalizadasReport) {
+                const result = await window.electronAPI.generateOsFinalizadasReport();
+                if (result && result.success) {
+                    showToast('Relatório de OS Finalizadas gerado com sucesso!', 'success');
+                } else {
+                    showToast('Erro ao gerar relatório: ' + (result?.error || 'Erro desconhecido'), 'danger');
+                }
+            }
+        });
+    }
+
+    const btnAbertas = document.getElementById('btnRelatorioOsAbertas');
+    if (btnAbertas) {
+        btnAbertas.addEventListener('click', async () => {
+            if (window.electronAPI && window.electronAPI.generateOsAbertasReport) {
+                const result = await window.electronAPI.generateOsAbertasReport();
+                if (result && result.success) {
+                    showToast('Relatório de OS Abertas gerado com sucesso!', 'success');
+                } else {
+                    showToast('Erro ao gerar relatório: ' + (result?.error || 'Erro desconhecido'), 'danger');
+                }
+            }
+        });
+    }
+
+    // Exemplo de template para adicionar nova peça
+function getPartRowHtml() {
+    return `
+    <div class="row g-2 align-items-end part-row">
+        <div class="col-12 col-md-4">
+            <label class="form-label mb-1" for="partName">Nome da peça</label>
+            <input type="text" class="form-control" name="partName[]" placeholder="Ex: Placa-mãe" required>
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label mb-1" for="partQty">Qtd.</label>
+            <input type="number" class="form-control" name="partQty[]" min="1" placeholder="Qtd." required>
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label mb-1" for="partValue">Valor (R$)</label>
+            <input type="number" class="form-control" name="partValue[]" min="0" step="0.01" placeholder="Valor (R$)" required>
+        </div>
+        <div class="col-12 col-md-2 text-end">
+            <label class="form-label d-none d-md-block mb-1">&nbsp;</label>
+            <button type="button" class="btn btn-outline-danger btn-sm remove-part-btn mt-md-2" title="Remover peça">
+                <i data-feather="trash-2"></i>
+            </button>
+        </div>
+    </div>
+    `;
+}
+document.getElementById('addPartButton').addEventListener('click', function() {
+    document.getElementById('partsContainer').insertAdjacentHTML('beforeend', getPartRowHtml());
+    if (window.feather) feather.replace();
+});
 });
