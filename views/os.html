@@ -3,275 +3,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://viacep.com.br; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net https://unpkg.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://viacep.com.br; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; script-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net https://unpkg.com;">
     <title>Ordens de Serviço - VoltDesk</title>
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/feather.css">
+    <!-- Bootstrap JS (carregado no head para garantir disponibilidade) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Verificar se o Bootstrap foi carregado corretamente
+        window.addEventListener('load', function() {
+            if (typeof bootstrap === 'undefined') {
+                console.error('Bootstrap não foi carregado corretamente');
+                // Tentar recarregar o Bootstrap
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js';
+                script.onload = function() {
+                    console.log('Bootstrap recarregado com sucesso');
+                    // Disparar um evento personalizado para notificar que o Bootstrap está disponível
+                    window.dispatchEvent(new Event('bootstrapLoaded'));
+                };
+                script.onerror = function() {
+                    console.error('Falha ao recarregar o Bootstrap');
+                };
+                document.head.appendChild(script);
+            } else {
+                console.log('Bootstrap carregado com sucesso');
+                // Disparar um evento personalizado para notificar que o Bootstrap está disponível
+                window.dispatchEvent(new Event('bootstrapLoaded'));
+            }
+        });
+    </script>
 </head>
 <body class="body-form-page">
 
-    <header class="page-header sticky-top">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <h2 class="page-title">Gerenciamento de Ordens de Serviço</h2>
-                </div>
-                <div class="col-md-4">
-                    <!-- (Opcional: espaço para busca, se quiser padronizar) -->
-                </div>
-                <div class="col-md-4 d-flex justify-content-md-end gap-2">
-                    <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goHomeNav">
-                        <i data-feather="home" class="icon-nav"></i> Início
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary nav-btn-header" id="goToClientesPage">
-                        <i data-feather="users" class="icon-nav"></i> Cadastro de Clientes
-                    </button>
-                </div>
+    <div class="container-fluid px-3 py-2">
+        <div class="row align-items-center mb-2">
+            <div class="col-md-4">
+                <h2 class="page-title mb-0">Gerenciamento de Ordens de Serviço</h2>
+            </div>
+            <div class="col-md-4">
+                <!-- Espaço reservado para futuras funcionalidades -->
+            </div>
+            <div class="col-md-4 d-flex justify-content-md-end gap-2">
+                <button type="button" class="btn btn-outline-secondary nav-btn-header" id="navHome">
+                    <i data-feather="home" class="icon-nav"></i> Início
+                </button>
+                <button type="button" class="btn btn-outline-secondary nav-btn-header" id="navClients">
+                    <i data-feather="users" class="icon-nav"></i> Clientes
+                </button>
             </div>
         </div>
-    </header>
 
-    <main class="container-fluid form-container-main os-page-container">
-        
-        <form id="osForm" class="mb-4 needs-validation" novalidate>
-            <input type="hidden" id="osId">
-            <input type="hidden" id="selectedClientId">
+        <div class="row">
+            <div class="col-12">
+                <form id="osForm" class="needs-validation" novalidate>
+                    <input type="hidden" id="osId">
+                    <input type="hidden" id="selectedClientId">
 
-            <div class="row section-divider">
-                <div class="col-lg-7 border-end-lg pe-lg-4">
-                    <fieldset class="form-section mb-3">
-                        <legend class="form-section-legend">Informações da OS</legend>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="entryDate" class="form-label">Data de Entrada</label>
-                                <input type="text" class="form-control" id="entryDate" readonly>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="statusOs" class="form-label">Status <span class="text-danger">*</span></label>
-                                <select class="form-select" id="statusOs" required>
-                                    <option value="Aberta" selected>Aberta</option>
-                                    <option value="Em Análise">Em Análise</option>
-                                    <option value="Aguardando Aprovação">Aguardando Aprovação</option>
-                                    <option value="Aguardando Peças">Aguardando Peças</option>
-                                    <option value="Em Reparo">Em Reparo</option>
-                                    <option value="Finalizada">Finalizada</option>
-                                    <option value="Cancelada">Cancelada</option>
-                                    <option value="Entregue">Entregue</option>
-                                </select>
-                                <div class="invalid-feedback">Selecione um status.</div>
-                            </div>
-                        </div>
-                    </fieldset>
-
-                    <fieldset class="form-section mb-3">
-                        <legend class="form-section-legend">Cliente</legend>
-                        <div class="row">
-                            <div class="col-md-7 mb-3">
-                                <label for="searchClientInput" class="form-label">Buscar Cliente (Nome/CPF) <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="searchClientInput" placeholder="Digite para buscar..." required>
-                                <div id="clientSearchResults" class="list-group mt-1 search-results-absolute" style="max-height: 150px; overflow-y: auto;"></div>
-                                <div class="invalid-feedback">É necessário selecionar um cliente.</div>
-                            </div>
-                            <div class="col-md-5 mb-3">
-                                <label class="form-label">Cliente Selecionado</label>
-                                <div id="selectedClientInfo" class="form-control-plaintext p-2 border rounded" style="min-height: 58px; background-color: #f8f9fa;">
-                                    Nenhum cliente selecionado.
+                    <div class="row section-divider">
+                        <div class="col-lg-7 border-end-lg pe-lg-4">
+                            <fieldset class="form-section mb-3">
+                                <legend class="form-section-legend">Informações da OS</legend>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="entryDate" class="form-label">Data de Entrada</label>
+                                        <input type="text" class="form-control" id="entryDate" readonly>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="statusOs" class="form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="has-validation">
+                                            <select class="form-select" id="statusOs" name="statusOs" required>
+                                                <option value="">Selecione...</option>
+                                                <option value="Aberta">Aberta</option>
+                                                <option value="Em Análise">Em Análise</option>
+                                                <option value="Aguardando Aprovação">Aguardando Aprovação</option>
+                                                <option value="Aguardando Peças">Aguardando Peças</option>
+                                                <option value="Em Reparo">Em Reparo</option>
+                                                <option value="Finalizada">Finalizada</option>
+                                                <option value="Cancelada">Cancelada</option>
+                                                <option value="Entregue">Entregue</option>
+                                            </select>
+                                            <div class="invalid-feedback">Selecione um status.</div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </fieldset>
+                            </fieldset>
 
-                    <fieldset class="form-section mb-3">
-                        <legend class="form-section-legend">Equipamento e Defeito</legend>
-                        <div class="mb-3">
-                            <label for="equipment" class="form-label">Equipamento (Marca, Modelo, S/N) <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="equipment" required>
-                            <div class="invalid-feedback">Descreva o equipamento.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="accessories" class="form-label">Acessórios Deixados</label>
-                            <input type="text" class="form-control" id="accessories" placeholder="Ex: Fonte, cabo, mouse...">
-                        </div>
-                        <div class="mb-3">
-                            <label for="reportedIssue" class="form-label">Defeito Relatado <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="reportedIssue" rows="3" required></textarea>
-                            <div class="invalid-feedback">Descreva o defeito relatado.</div>
-                        </div>
-                    </fieldset>
-                </div>
+                            <fieldset class="form-section mb-3">
+                                <legend class="form-section-legend">Cliente</legend>
+                                <div class="row">
+                                    <div class="col-md-7 mb-3">
+                                        <label for="searchClientInput" class="form-label">Buscar Cliente (Nome/CPF) <span class="text-danger">*</span></label>
+                                        <div class="input-group has-validation">
+                                            <input type="text" class="form-control" id="searchClientInput" placeholder="Digite para buscar..." required>
+                                            <button class="btn btn-outline-secondary" type="button" id="searchClientButton">
+                                                <i data-feather="search" class="icon-btn-sm"></i>
+                                            </button>
+                                            <div class="invalid-feedback">É necessário selecionar um cliente.</div>
+                                        </div>
+                                        <div id="clientSearchResults" class="list-group mt-1 search-results-absolute" style="max-height: 150px; overflow-y: auto;"></div>
+                                    </div>
+                                    <div class="col-md-5 mb-3">
+                                        <label class="form-label">Cliente Selecionado</label>
+                                        <div id="selectedClientInfo" class="selected-client-container">
+                                            <div class="selected-client-placeholder">
+                                                <i data-feather="user" class="text-muted me-2"></i>
+                                                <span>Nenhum cliente selecionado.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
 
-                <div class="col-lg-5 ps-lg-4">
-                    <fieldset class="form-section mb-3">
-                        <legend class="form-section-legend">Diagnóstico e Serviço</legend>
-                        <div class="mb-3">
-                            <label for="technicianNotes" class="form-label">Observações Técnicas / Diagnóstico</label>
-                            <textarea class="form-control" id="technicianNotes" rows="3"></textarea>
+                            <fieldset class="form-section mb-3">
+                                <legend class="form-section-legend">Equipamento e Defeito</legend>
+                                <div class="mb-3">
+                                    <label for="equipment" class="form-label">Equipamento (Marca, Modelo, S/N) <span class="text-danger">*</span></label>
+                                    <div class="has-validation">
+                                        <input type="text" class="form-control" id="equipment" name="equipment" required>
+                                        <div class="invalid-feedback">Descreva o equipamento.</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="accessories" class="form-label">Acessórios Deixados</label>
+                                    <input type="text" class="form-control" id="accessories" placeholder="Ex: Fonte, cabo, mouse...">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reportedIssue" class="form-label">Defeito Relatado <span class="text-danger">*</span></label>
+                                    <div class="has-validation">
+                                        <textarea class="form-control" id="reportedIssue" name="reportedIssue" rows="3" required></textarea>
+                                        <div class="invalid-feedback">Descreva o defeito relatado.</div>
+                                    </div>
+                                </div>
+                            </fieldset>
                         </div>
-                        <div class="mb-3">
-                            <label for="servicePerformed" class="form-label">Serviço Realizado</label>
-                            <textarea class="form-control" id="servicePerformed" rows="3"></textarea>
+
+                        <div class="col-lg-5 ps-lg-4">
+                            <fieldset class="form-section mb-3">
+                                <legend class="form-section-legend">Diagnóstico e Serviço</legend>
+                                <div class="mb-3">
+                                    <label for="technicianNotes" class="form-label">Observações Técnicas / Diagnóstico</label>
+                                    <textarea class="form-control" id="technicianNotes" rows="3"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="servicePerformed" class="form-label">Serviço Realizado</label>
+                                    <textarea class="form-control" id="servicePerformed" rows="3"></textarea>
+                                </div>
+                            </fieldset>
+                    
+                            <fieldset class="form-section mb-3">
+                                <legend class="form-section-legend">Peças e Custos</legend>
+                                <div id="partsContainer" class="mb-2">
+                                    <!-- Linha inicial de peça (visível) -->
+                                    <div class="row g-2 part-row">
+                                        <div class="col-sm-5">
+                                            <div class="has-validation validation-container">
+                                                <label for="part-name" class="form-label">Peça</label>
+                                                <input type="text" class="form-control part-name" name="part-name" placeholder="Nome da Peça">
+                                                <div class="invalid-feedback">Nome da peça é obrigatório.</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class="has-validation validation-container">
+                                                <label for="part-quantity" class="form-label">Qtd <span class="text-danger">*</span></label>
+                                                <input type="number" class="form-control part-quantity" name="part-quantity" min="1" value="1" required>
+                                                <div class="invalid-feedback">Mínimo 1.</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class="has-validation validation-container">
+                                                <label for="part-unit-price" class="form-label">R$ Unit. <span class="text-danger">*</span></label>
+                                                <input type="number" class="form-control part-unit-price" name="part-unit-price" min="0" step="0.01" value="0.00" required>
+                                                <div class="invalid-feedback">Valor inválido.</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <label for="part-total-price" class="form-label mb-1">Total</label>
+                                            <input type="number" class="form-control part-total-price" name="part-total-price" readonly value="0.00">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <button type="button" class="btn btn-outline-danger remove-part-button" style="display: none;">
+                                                <i data-feather="trash-2" class="icon-btn-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" 
+                                        class="btn btn-sm btn-outline-primary mb-3" 
+                                        id="addPartButton">
+                                    <i data-feather="plus-circle" class="icon-btn-sm"></i> Adicionar Peça
+                                </button>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="has-validation">
+                                            <label for="laborCost" class="form-label">Custo de Mão de Obra (R$) <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="laborCost" name="laborCost" min="0" step="0.01" value="0.00" required>
+                                            <div class="invalid-feedback">Valor deve ser numérico e não negativo.</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="has-validation">
+                                            <label for="otherCosts" class="form-label">Outros Custos (R$) <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="otherCosts" name="otherCosts" min="0" step="0.01" value="0.00" required>
+                                            <div class="invalid-feedback">Valor deve ser numérico e não negativo.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="totalCost" class="form-label">Custo Total (R$)</label>
+                                    <input type="text" class="form-control form-control-lg" id="totalCost" value="0.00" readonly style="font-weight: bold; font-size: 1.2rem;">
+                                </div>
+                            </fieldset>
                         </div>
-                    </fieldset>
-            
-                    <fieldset class="form-section mb-3">
-                        <legend class="form-section-legend">Peças e Custos</legend>
-                        <div id="partsContainer" class="mb-2">
-                            <div class="row g-2 align-items-end part-row">
-    <div class="col-12 col-md-4">
-        <label class="form-label mb-1" for="partName">Nome da peça</label>
-        <input type="text" class="form-control" id="partName" name="partName[]" placeholder="Ex: Placa-mãe" required>
-    </div>
-    <div class="col-6 col-md-3">
-        <label class="form-label mb-1" for="partQty">Qtd.</label>
-        <input type="number" class="form-control" id="partQty" name="partQty[]" min="1" placeholder="Qtd." required>
-    </div>
-    <div class="col-6 col-md-3">
-        <label class="form-label mb-1" for="partValue">Valor (R$)</label>
-        <input type="number" class="form-control" id="partValue" name="partValue[]" min="0" step="0.01" placeholder="Valor (R$)" required>
-    </div>
-    <div class="col-12 col-md-2 text-end">
-        <label class="form-label d-none d-md-block mb-1">&nbsp;</label>
-        <button type="button" class="btn btn-outline-danger btn-sm remove-part-btn mt-md-2" title="Remover peça">
-            <i data-feather="trash-2"></i>
-        </button>
-    </div>
-</div>
-                        </div>
-                        <button type="button" class="btn btn-sm btn-outline-primary mb-3" id="addPartButton">
-                            <i data-feather="plus-circle" class="icon-btn-sm"></i> Adicionar Peça
+                    </div>
+
+                    <div id="osFormFeedbackGlobal" class="alert d-none mt-3" role="alert"></div>
+                    <div class="form-actions text-center mt-4 pt-3 border-top">
+                        <button type="submit" class="btn btn-success btn-lg me-2" id="saveOsButton">
+                            <i data-feather="check-circle" class="icon-btn"></i> Salvar OS
                         </button>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="laborCost" class="form-label">Mão de Obra (R$)</label>
-                                <input type="number" step="0.01" min="0" class="form-control cost-input" id="laborCost" value="0.00">
-                                <div class="invalid-feedback">Valor inválido.</div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="otherCosts" class="form-label">Outros Custos (R$)</label>
-                                <input type="number" step="0.01" min="0" class="form-control cost-input" id="otherCosts" value="0.00">
-                                 <div class="invalid-feedback">Valor inválido.</div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="totalCost" class="form-label">Custo Total (R$)</label>
-                            <input type="text" class="form-control form-control-lg" id="totalCost" value="0.00" readonly style="font-weight: bold; font-size: 1.2rem;">
-                        </div>
-                    </fieldset>
-                </div>
-            </div>
+                        <button type="button" class="btn btn-outline-secondary btn-lg me-2" id="clearOsFormButton">
+                            <i data-feather="rotate-ccw" class="icon-btn"></i> Nova / Limpar
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-lg d-none" id="deleteOsButton">
+                            <i data-feather="trash-2" class="icon-btn"></i> Excluir OS
+                        </button>
+                    </div>
+                </form>
 
-            <div id="osFormFeedbackGlobal" class="alert d-none mt-3" role="alert"></div>
-            <div class="form-actions text-center mt-4 pt-3 border-top">
-                <button type="submit" class="btn btn-success btn-lg me-2" id="saveOsButton">
-                    <i data-feather="check-circle" class="icon-btn"></i> Salvar OS
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-lg me-2" id="clearOsFormButton">
-                    <i data-feather="x-circle" class="icon-btn"></i> Nova / Limpar
-                </button>
-                <button type="button" class="btn btn-outline-danger btn-lg d-none" id="deleteOsButton">
-                    <i data-feather="trash-2" class="icon-btn"></i> Excluir OS
-                </button>
-            </div>
-        </form>
-        <hr class="my-5"> 
+                <div class="form-section">
+                    <h2>Ordens de Serviço Cadastradas</h2>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nº OS</th>
+                                    <th>Cliente</th>
+                                    <th>Data de Entrada</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="osList">
+                                <!-- As ordens de serviço serão inseridas aqui via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-        <div class="os-list-section">
-            <h3 class="mb-3">Ordens de Serviço Cadastradas</h3>
-            <div class="row mb-3 align-items-end">
-                 <div class="col-md-5"> 
-                    <label for="searchOsInput" class="form-label">Buscar OS (Nº, Cliente, Equip.)</label>
-                    <input type="text" class="form-control" id="searchOsInput" placeholder="Digite para buscar...">
+                <div class="mb-3">
+                    <button id="btnRelatorioClientes" class="btn btn-primary btn-lg me-2 os-report-btn">
+                        <i data-feather="users"></i> Relatório de Clientes
+                    </button>
+                    <button id="btnRelatorioOsFinalizadas" class="btn btn-success btn-lg me-2 os-report-btn">
+                        <i data-feather="check-circle"></i> Relatório OS Finalizadas
+                    </button>
+                    <button id="btnRelatorioOsAbertas" class="btn btn-warning btn-lg os-report-btn">
+                        <i data-feather="alert-circle"></i> Relatório OS Abertas
+                    </button>
                 </div>
-                <div class="col-md-4"> 
-                    <label for="filterStatus" class="form-label">Filtrar por Status</label>
-                    <select id="filterStatus" class="form-select">
-                        <option value="">Todos</option>
-                        <option value="Aberta">Aberta</option>
-                        <option value="Em Análise">Em Análise</option>
-                        <option value="Aguardando Aprovação">Aguardando Aprovação</option>
-                        <option value="Aguardando Peças">Aguardando Peças</option>
-                        <option value="Em Reparo">Em Reparo</option>
-                        <option value="Finalizada">Finalizada</option>
-                        <option value="Cancelada">Cancelada</option>
-                        <option value="Entregue">Entregue</option>
-                    </select>
-                </div>
-                <div class="col-md-3"> 
-                    <label for="osPerPageSelect" class="form-label">Itens por pág.</label>
-                    <select id="osPerPageSelect" class="form-select">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                    </select>
-                </div>
-               
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-bordered">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Nº OS</th>
-                            <th>Cliente</th>
-                            <th>Equipamento</th>
-                            <th>Data Entrada</th>
-                            <th>Status</th>
-                            <th>Total (R$)</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="osTableBody">
-                        </tbody>
-                </table>
-            </div>
-            <nav aria-label="Paginação da Lista de OS">
-                <ul class="pagination justify-content-center mt-3" id="osPaginationControls">
-                    </ul>
-            </nav>
         </div>
+    </div>
 
-        <div class="mb-3">
-            <button id="btnRelatorioClientes" class="btn btn-primary btn-lg me-2 os-report-btn">
-                <i data-feather="users"></i> Relatório de Clientes
-            </button>
-            <button id="btnRelatorioOsFinalizadas" class="btn btn-success btn-lg me-2 os-report-btn">
-                <i data-feather="check-circle"></i> Relatório OS Finalizadas
-            </button>
-            <button id="btnRelatorioOsAbertas" class="btn btn-warning btn-lg os-report-btn">
-                <i data-feather="alert-circle"></i> Relatório OS Abertas
-            </button>
-        </div>
-    </main>
-
-    <footer class="app-footer fixed-bottom py-2 mt-4 small">
+    <footer class="app-footer fixed-bottom py-2 mt-4 small" role="contentinfo">
         <div class="container-fluid px-md-4 d-flex justify-content-between align-items-center">
-            <div id="copyrightText">
+            <div id="copyrightText" aria-live="polite">
                 &copy; <span id="currentYear"></span> VoltDesk. Todos os direitos reservados.
             </div>
-            <div class="d-flex align-items-center">
-                <span id="currentDateTime" class="me-3"></span>
+            <div class="d-flex align-items-center" aria-live="polite">
+                <span id="currentDateTime" class="me-3" aria-label="Data e hora atual"></span>
                 <span>Status DB:</span> 
-                <i data-feather="database" id="dbStatusIcon" class="align-middle ms-1 me-1"></i>
-                <span id="dbStatusText">Desconectado</span>
+                <i data-feather="database" id="dbStatusIcon" class="align-middle ms-1 me-1" aria-hidden="true"></i>
+                <span id="dbStatus" class="text-status-disconnected" aria-label="Status do banco de dados">Desconectado</span>
             </div>
         </div>
     </footer>
 
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100"></div>
-    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title" id="confirmationModalLabel">Confirmação</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button></div>
-        <div class="modal-body" id="confirmationModalBody">Você tem certeza?</div>
-        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirmationModalCancel">Cancelar</button><button type="button" class="btn btn-primary" id="confirmationModalConfirm">Confirmar</button></div>
-      </div></div>
-    </div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100" id="toastContainer"></div>
 
-    <script src="../assets/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="../assets/js/cpf_validator.js"></script> 
-    <script src="../assets/js/email_validator.js"></script> 
+    <!-- Scripts -->
+    <script src="../assets/js/vendor/feather-icons.min.js"></script>
+    <script src="../assets/js/feather_init.js"></script>
+    <script src="../assets/js/cpf_validator.js"></script>
+    <script src="../assets/js/email_validator.js"></script>
+    <script src="../assets/js/renderer.js"></script>
     <script src="../assets/js/renderer_os.js"></script>
-    </body>
+</body>
 </html>

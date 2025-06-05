@@ -1,94 +1,184 @@
 /* assets/css/index.css - Estilos específicos para a página inicial moderna */
 
+:root {
+    --transition-speed: 0.3s;
+    --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.5);
+    --bg-home: #cbd5e1; /* Cor de fundo mais escura para a página inicial */
+}
+
+/* Skip Link for Accessibility */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--primary-color);
+    color: white;
+    padding: 8px;
+    z-index: 100;
+    transition: top var(--transition-speed) var(--transition-timing);
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
 body.body-home {
-    background-color: #f4f7f9;
-    color: #4a5568;
-    padding-bottom: 20px; /* Espaço para o footer fixo */
+    background-color: var(--bg-home);
+    color: var(--gray-800);
+    padding-bottom: 0;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    line-height: 1.6;
+    overflow: hidden;
 }
 
 /* Seção Hero (Boas-vindas) */
 .hero-section {
-    padding: 0.5rem 0; /* Antes: 1.5rem 0 */
-    padding-bottom: 0.25rem;
-    margin-bottom: 0.25rem;
+    padding: var(--spacing-md) 0;
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+    animation: fadeInDown 0.8s var(--transition-timing);
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .app-logo-main {
-    max-width: 230px; /* Logo principal um pouco menor */
+    max-width: 200px;
     height: auto;
-    margin-bottom: 1rem;
+    margin-bottom: var(--spacing-md);
+    filter: drop-shadow(var(--shadow-md));
+    transition: transform var(--transition-speed) var(--transition-timing);
 }
 
-.hero-section .display-5 {
-    color: #2c3e50;
-    margin-bottom: 0.5rem; /* Menos espaço abaixo do título */
-    font-size: 2.25rem; /* Tamanho do display-5 um pouco menor se necessário */
+.app-logo-main:hover {
+    transform: scale(1.02);
+}
+
+.hero-section .display-7 {
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-xs);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
 }
 
 .hero-section .lead {
-    font-size: 1.1rem;
-    color: #5a6878;
-    margin-bottom: 1.5rem; /* Menos espaço abaixo do lead */
+    font-size: 1rem;
+    color: #334155; /* Cor mais escura para melhor legibilidade */
+    margin-bottom: var(--spacing-md);
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 500; /* Adicionado peso da fonte para melhor legibilidade */
 }
 
-/*Cards Interativos na Index */
+/* Cards Interativos na Index */
 .custom-card-index {
     background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.6rem; /* Bordas um pouco menos arredondadas */
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    transition: all var(--transition-speed) var(--transition-timing);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     text-decoration: none;
+    position: relative;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 
+                0 4px 6px -2px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(0, 0, 0, 0.08);
+    height: calc(100% - var(--spacing-md));
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.98);
+}
+
+.custom-card-index::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--border-radius-lg);
+    padding: 2px;
+    background: linear-gradient(45deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity var(--transition-speed) var(--transition-timing);
 }
 
 .custom-card-index:hover {
-    transform: translateY(-4px) scale(1.01); /* Efeito hover mais sutil */
-    box-shadow: 0 0.6rem 1.2rem rgba(44, 62, 80, 0.1), 0 0.2rem 0.4rem rgba(44,62,80,0.07) !important;
+    transform: translateY(-4px);
+    box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.2),
+                0 15px 15px -5px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.custom-card-index:hover::before {
+    opacity: 1;
+}
+
+.custom-card-index:focus-within {
+    outline: none;
+    box-shadow: var(--focus-ring), var(--shadow-lg);
 }
 
 .card-accent-primary {
-    border-left: 4px solid var(--bs-primary);
+    border-left: 4px solid var(--primary-color);
 }
 
 .card-accent-success {
-    border-left: 4px solid var(--bs-success);
+    border-left: 4px solid var(--success-color);
 }
 
 .icon-circle {
-    width: 60px; /* Círculo do ícone menor */
-    height: 60px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-bottom: 0.75rem; /* Menos espaço abaixo do círculo */
+    margin-bottom: var(--spacing-md);
+    transition: transform var(--transition-speed) var(--transition-timing);
+}
+
+.custom-card-index:hover .icon-circle {
+    transform: scale(1.1);
 }
 
 .bg-primary-soft {
-    background-color: #e7f3ff;
-}
-.text-primary {
-    color: #007bff !important;
+    background-color: rgba(59, 130, 246, 0.15);
 }
 
 .bg-success-soft {
-    background-color: #eaf6ec;
-}
-.text-success {
-    color: #28a745 !important;
+    background-color: rgba(16, 185, 129, 0.15);
 }
 
-/* Ícones dentro dos cards (eram .icon-xxl, agora .icon-xl no HTML) */
+/* Ícones dentro dos cards */
 .icon-xl {
-    width: 28px; /* Ícones principais nos cards menores */
+    width: 28px;
     height: 28px;
     stroke-width: 2;
+    transition: transform var(--transition-speed) var(--transition-timing);
+}
+
+.custom-card-index:hover .icon-xl {
+    transform: scale(1.1);
 }
 
 .custom-card-index .card-body {
@@ -97,45 +187,156 @@ body.body-home {
     justify-content: space-between;
     flex-grow: 1;
     text-align: center;
-    padding: 1rem; /* Padding interno do card reduzido (era p-3 no HTML, pode ser controlado aqui) */
+    padding: var(--spacing-md);
 }
 
-.custom-card-index .card-title { /* Agora é h5 no HTML */
-    color: #343a40;
-    margin-bottom: 0.5rem;
-    font-size: 1.15rem; /* Tamanho da fonte do título do card */
-}
-.custom-card-index .card-text { /* Agora tem .small no HTML */
-    font-size: 0.875rem; /* Reforça o tamanho pequeno */
-    margin-bottom: 1rem;
-    line-height: 1.4; /* Altura da linha para o texto pequeno */
+.custom-card-index .card-title {
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-xs);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
 }
 
-.custom-card-index .btn { /* Botão tamanho padrão */
+.custom-card-index .card-text {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.5;
+}
+
+.custom-card-index .btn {
     font-weight: 500;
-    padding: 0.5rem 1rem; /* Padding do botão padrão */
+    padding: 0.5rem 1rem;
     margin-top: auto;
     width: auto;
     align-self: center;
-    font-size: 0.9rem; /* Fonte do botão um pouco menor */
+    font-size: 0.875rem;
+    border-radius: var(--border-radius-md);
+    transition: all var(--transition-speed) var(--transition-timing);
+    position: relative;
+    overflow: hidden;
 }
+
+.custom-card-index .btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.custom-card-index .btn:hover::after {
+    animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(20, 20);
+        opacity: 0;
+    }
+}
+
 .custom-card-index .btn i[data-feather].icon-sm-btn {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     vertical-align: middle;
     stroke-width: 2.5;
-    margin-left: 0.25rem;
+    margin-left: var(--spacing-xs);
+    transition: transform var(--transition-speed) var(--transition-timing);
 }
 
-body.body-home > main.container {
-    padding-top: 0;
-    padding-bottom: 2rem;
+.custom-card-index .btn:hover i[data-feather].icon-sm-btn {
+    transform: translateX(4px);
 }
 
-body.body-home .row {
-    margin-top: 0 !important;
+/* Footer Styles - Usando as variáveis globais definidas em style.css */
+/* O rodapé agora usa as variáveis globais:
+   --bg-footer: #2d3748
+   --text-footer: #e2e8f0
+   --border-footer: #4a5568
+*/
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: var(--spacing-sm) 0;
+    }
+
+    .hero-section .display-7 {
+        font-size: 1.75rem;
+    }
+    
+    .hero-section .lead {
+        font-size: 0.9375rem;
+        padding: 0 var(--spacing-sm);
+    }
+    
+    .custom-card-index {
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .custom-card-index .card-body {
+        padding: var(--spacing-sm);
+    }
 }
 
-.cards-index-container {
-    margin-top: -4rem;
+@media (max-width: 576px) {
+    .hero-section {
+        text-align: center;
+        padding: var(--spacing-xs) 0;
+    }
+    
+    .app-logo-main {
+        max-width: 160px;
+    }
+    
+    .custom-card-index .card-body {
+        padding: var(--spacing-sm) var(--spacing-xs);
+    }
+
+    .app-footer {
+        font-size: 0.75rem;
+    }
+
+    .app-footer .container-fluid {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+        text-align: center;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (forced-colors: active) {
+    .custom-card-index {
+        border: 2px solid CanvasText;
+    }
+
+    .custom-card-index:hover {
+        border-color: Highlight;
+    }
+
+    .btn {
+        border: 2px solid CanvasText;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

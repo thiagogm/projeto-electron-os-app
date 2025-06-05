@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://unpkg.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://viacep.com.br; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net https://unpkg.com;">
     <title>Sobre o VoltDesk</title>
     <style>
         :root {
@@ -180,6 +180,8 @@
         </div>
     </div>
 
+    <script src="../assets/js/vendor/feather-icons.min.js"></script>
+    <script src="../assets/js/feather_init.js"></script>
     <script>
         // Configurar ano atual
         document.getElementById('currentYear').textContent = new Date().getFullYear();

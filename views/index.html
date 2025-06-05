@@ -3,74 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://viacep.com.br; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://viacep.com.br; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net https://unpkg.com;">
+    <meta name="description" content="VoltDesk - Sistema de gerenciamento de clientes e ordens de serviço para eletricistas">
     <title>VoltDesk - Início</title>
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css"> <link rel="stylesheet" href="../assets/css/index.css"> </head>
-<body class="body-home">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/index.css">
+    <link rel="stylesheet" href="../assets/css/feather.css">
+</head>
+<body class="body-home" role="application">
+    <a href="#main-content" class="skip-link visually-hidden-focusable">Pular para o conteúdo principal</a>
 
-    <main class="container mt-4 pt-3 text-center"> 
-        <div class="hero-section mb-4"> 
-            <img src="../assets/icons/Logo-VoltDesk.png" alt="Logo Principal VoltDesk" id="appLogo" class="app-logo-main mb-3"> 
-            <h4 class="display-7 fw-bold text-primary mb-2">Seja bem-vindo!</h4> 
-            <p class="lead text-secondary col-lg-9 mx-auto mb-4"> 
+    <main id="main-content" class="container mt-3 pt-2 text-center" role="main"> 
+        <div class="hero-section mb-3" aria-labelledby="welcome-title"> 
+            <img src="../assets/icons/Logo-VoltDesk.png" 
+                 alt="Logo Principal VoltDesk" 
+                 id="appLogo" 
+                 class="app-logo-main mb-2"
+                 width="200"
+                 height="auto"
+                 loading="eager"> 
+            <h1 id="welcome-title" class="display-7 fw-bold text-primary mb-2">Seja bem-vindo!</h1> 
+            <p class="lead text-secondary col-lg-8 mx-auto mb-3" role="doc-subtitle"> 
                 Sua solução completa e intuitiva para gerenciamento de clientes e ordens de serviço.
             </p>
         </div>
 
-        <div class="row justify-content-center gx-lg-4 gy-3"> 
+        <div class="row justify-content-center gx-lg-4 gy-3" role="navigation" aria-label="Menu principal"> 
             <div class="col-lg-4 col-md-5"> 
-                <div class="card h-100 shadow-sm custom-card-index card-accent-primary interactive-card" id="goToCadastroCliente">
+                <article class="card h-100 shadow-sm custom-card-index card-accent-primary interactive-card" 
+                         id="goToCadastroCliente"
+                         role="button"
+                         tabindex="0"
+                         aria-label="Ir para Cadastro de Clientes">
                     <div class="card-body p-3 d-flex flex-column align-items-center"> 
-                        <div class="icon-circle bg-primary-soft text-primary mb-3"> 
+                        <div class="icon-circle bg-primary-soft text-primary mb-2" aria-hidden="true"> 
                             <i data-feather="users" class="icon-xl"></i> 
                         </div>
-                        <h5 class="card-title h5 fw-bold mb-2">Cadastro de Clientes</h5> 
-                        <p class="card-text text-muted small mb-3 flex-grow-1">Gerencie informações dos seus clientes de forma organizada.</p> 
+                        <h2 class="card-title h5 fw-bold mb-2">Cadastro de Clientes</h2> 
+                        <p class="card-text text-muted small mb-2 flex-grow-1">Gerencie informações dos seus clientes de forma organizada.</p> 
                         <div class="d-grid w-100">
-                            <button class="btn btn-primary"> 
-                                Acessar Clientes <i data-feather="arrow-right-circle" class="ms-1 icon-sm-btn"></i>
+                            <button class="btn btn-primary" 
+                                    aria-label="Acessar Cadastro de Clientes">
+                                Acessar Clientes 
+                                <i data-feather="arrow-right-circle" class="ms-1 icon-btn-sm" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
-                </div>
+                </article>
             </div>
             <div class="col-lg-4 col-md-5"> 
-                <div class="card h-100 shadow-sm custom-card-index card-accent-success interactive-card" id="goToOS">
+                <article class="card h-100 shadow-sm custom-card-index card-accent-success interactive-card" 
+                         id="goToOS"
+                         role="button"
+                         tabindex="0"
+                         aria-label="Ir para Ordens de Serviço">
                     <div class="card-body p-3 d-flex flex-column align-items-center">
-                        <div class="icon-circle bg-success-soft text-success mb-3"> 
+                        <div class="icon-circle bg-success-soft text-success mb-2" aria-hidden="true"> 
                             <i data-feather="file-text" class="icon-xl"></i> 
                         </div>
-                        <h5 class="card-title h5 fw-bold mb-2">Ordens de Serviço</h5> 
-                        <p class="card-text text-muted small mb-3 flex-grow-1">Crie, acompanhe e finalize ordens de serviço de maneira prática.</p> 
+                        <h2 class="card-title h5 fw-bold mb-2">Ordens de Serviço</h2> 
+                        <p class="card-text text-muted small mb-2 flex-grow-1">Crie, acompanhe e finalize ordens de serviço de maneira prática.</p> 
                         <div class="d-grid w-100">
-                            <button class="btn btn-success">
-                                Gerenciar OS <i data-feather="arrow-right-circle" class="ms-1 icon-sm-btn"></i>
+                            <button class="btn btn-success"
+                                    aria-label="Acessar Ordens de Serviço">
+                                Gerenciar OS 
+                                <i data-feather="arrow-right-circle" class="ms-1 icon-btn-sm" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
-                </div>
+                </article>
             </div>
         </div>
     </main>
 
-<footer class="app-footer fixed-bottom py-2 mt-4 small">
+    <footer class="app-footer fixed-bottom py-2 mt-4 small" role="contentinfo">
         <div class="container-fluid px-md-4 d-flex justify-content-between align-items-center">
-            <div id="copyrightText">
+            <div id="copyrightText" aria-live="polite">
                 &copy; <span id="currentYear"></span> VoltDesk. Todos os direitos reservados.
             </div>
-            <div class="d-flex align-items-center">
-                <span id="currentDateTime" class="me-3"></span>
+            <div class="d-flex align-items-center" aria-live="polite">
+                <span id="currentDateTime" class="me-3" aria-label="Data e hora atual"></span>
                 <span>Status DB:</span> 
-                <i data-feather="database" id="dbStatusIcon" class="align-middle ms-1 me-1"></i>
-                <span id="dbStatusText">Desconectado</span>
+                <i data-feather="database" id="dbStatusIcon" class="align-middle ms-1 me-1" aria-hidden="true"></i>
+                <span id="dbStatusText" aria-label="Status do banco de dados">Desconectado</span>
             </div>
         </div>
     </footer>
 
     <script src="../assets/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="../assets/js/vendor/feather-icons.min.js" defer></script>
+    <script src="../assets/js/feather_init.js" defer></script>
     <script src="../assets/js/renderer_index.js"></script>
 </body>
 </html>

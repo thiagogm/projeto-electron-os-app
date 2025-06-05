@@ -59,27 +59,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function showConfirmationModal(message, onConfirmCallback) {
+    function showConfirmationModal(message, onConfirm) {
+        // Remover modal anterior se existir
+        const oldModal = document.getElementById('confirmationModal');
+        if (oldModal) {
+            oldModal.remove();
+        }
+
+        // Criar o modal
+        const modalHtml = `
+            <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true" data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmationModalLabel">Confirmação</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-0">${message}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-danger" id="confirmDeleteButton">Confirmar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Adicionar o modal ao body
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Obter referência ao modal
         const modalElement = document.getElementById('confirmationModal');
-        const modalBody = document.getElementById('confirmationModalBody');
-        const confirmButton = document.getElementById('confirmationModalConfirm');
-        if (!modalElement || !modalBody || !confirmButton) {
-            if (confirm(message)) { // Fallback
-                if (typeof onConfirmCallback === 'function') onConfirmCallback();
+        const modal = new bootstrap.Modal(modalElement, {
+            backdrop: 'static',
+            keyboard: false
+        });
+        
+        // Configurar o evento de confirmação
+        const confirmButton = modalElement.querySelector('#confirmDeleteButton');
+        confirmButton.addEventListener('click', () => {
+            modal.hide();
+            if (typeof onConfirm === 'function') {
+                onConfirm();
             }
-            return;
-        }
-        modalBody.textContent = message;
-        const bsModal = new bootstrap.Modal(modalElement);
-        const newConfirmButton = confirmButton.cloneNode(true);
-        confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
-        if (typeof onConfirmCallback === 'function') {
-            newConfirmButton.addEventListener('click', () => { 
-                onConfirmCallback(); 
-                bsModal.hide(); 
-            }, { once: true });
-        }
-        bsModal.show();
+        });
+
+        // Configurar evento de fechamento
+        modalElement.addEventListener('hidden.bs.modal', () => {
+            modal.dispose();
+            modalElement.remove();
+        });
+
+        // Mostrar o modal
+        modal.show();
     }
 
     // --- LÓGICA DO RODAPÉ (Padronizada) ---
@@ -136,12 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Navegação do Header ---
-    document.getElementById('goHomeNav')?.addEventListener('click', () => {
+    document.getElementById('navHome')?.addEventListener('click', () => {
         if (window.electronAPI && window.electronAPI.navigateTo) {
             window.electronAPI.navigateTo('index.html');
         } else { console.warn("API de navegação não disponível.");}
     });
-    document.getElementById('goToOsPage')?.addEventListener('click', () => {
+    document.getElementById('navOs')?.addEventListener('click', () => {
         if (window.electronAPI && window.electronAPI.navigateTo) {
             window.electronAPI.navigateTo('os.html');
         } else { console.warn("API de navegação não disponível.");}
@@ -424,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     (currentId && typeof window.electronAPI.updateClient !== 'function') ||
                     (!currentId && typeof window.electronAPI.addClient !== 'function') ) {
                     showToast('API de salvamento de cliente não disponível.', 'danger'); 
-                    if(saveButton) { saveButton.disabled = false; saveButton.innerHTML = clientIdField.value ? `<i data-feather="arrow-clockwise" class="icon-btn"></i> Atualizar Cliente` : `<i data-feather="check-circle" class="icon-btn"></i> Salvar Cliente`; feather.replace(); }
+                    if(saveButton) { saveButton.disabled = false; saveButton.innerHTML = clientIdField.value ? `<i data-feather="rotate-cw" class="icon-btn"></i> Atualizar Cliente` : `<i data-feather="check-circle" class="icon-btn"></i> Salvar Cliente`; feather.replace(); }
                     return;
                 }
 
@@ -454,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } finally {
                 if (saveButton) {
                     saveButton.disabled = false;
-                    saveButton.innerHTML = clientIdField.value ? `<i data-feather="arrow-clockwise" class="icon-btn"></i> Atualizar Cliente` : `<i data-feather="check-circle" class="icon-btn"></i> Salvar Cliente`;
+                    saveButton.innerHTML = clientIdField.value ? `<i data-feather="rotate-cw" class="icon-btn"></i> Atualizar Cliente` : `<i data-feather="check-circle" class="icon-btn"></i> Salvar Cliente`;
                     if (typeof feather !== 'undefined' && feather.replace) feather.replace(); // Re-renderiza ícones no botão
                 }
             }
@@ -494,7 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clientForm?.classList.remove('was-validated');
         if(clientIdField) clientIdField.value = '';
         if(saveButton) {
-            saveButton.innerHTML = `<i data-feather="check-circle" class="icon-btn"></i> Salvar Cliente`;
+            saveButton.innerHTML = `<i data-feather="rotate-cw" class="icon-btn"></i> Atualizar Cliente`;
             if (typeof feather !== 'undefined' && feather.replace) feather.replace();
         }
         if(deleteButton) deleteButton.classList.add('d-none');
@@ -660,7 +694,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(observationsField) observationsField.value = client.notes || '';
 
                 if(saveButton) {
-                     saveButton.innerHTML = `<i data-feather="arrow-clockwise" class="icon-btn"></i> Atualizar Cliente`;
+                     saveButton.innerHTML = `<i data-feather="rotate-cw" class="icon-btn"></i> Atualizar Cliente`;
                      if (typeof feather !== 'undefined' && feather.replace) feather.replace(); // Re-renderiza ícone no botão
                 }
                 if(deleteButton) deleteButton.classList.remove('d-none');

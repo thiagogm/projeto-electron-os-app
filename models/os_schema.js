@@ -14,7 +14,7 @@ const ObjectId = Schema.Types.ObjectId;
 const partSchema = new Schema({
     name: {
         type: String,
-        required: [true, 'O nome da peça é obrigatório.'],
+        required: false,
         trim: true
     },
     quantity: {

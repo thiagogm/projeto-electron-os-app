@@ -30,12 +30,47 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1366,
         height: 768,
-        webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true },
+        webPreferences: { 
+            preload: path.join(__dirname, 'preload.js'), 
+            contextIsolation: true,
+            nodeIntegration: false,
+            enableRemoteModule: false,
+            sandbox: false,
+            webSecurity: true,
+            allowRunningInsecureContent: false,
+            spellcheck: false,
+            defaultEncoding: 'UTF-8'
+        },
         icon: path.join(__dirname, 'assets/icons/app_logo_grande.png')
     });
 
+    // Configurar CSP headers
+    mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+        callback({
+            responseHeaders: {
+                ...details.responseHeaders,
+                'Content-Security-Policy': [
+                    "default-src 'self';",
+                    "connect-src 'self' https://viacep.com.br;",
+                    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com;",
+                    "script-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com;",
+                    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;",
+                    "img-src 'self' data:;",
+                    "font-src 'self' https://cdn.jsdelivr.net https://unpkg.com;"
+                ].join(' ')
+            }
+        });
+    });
+
+    // Habilitar DevTools para debug
+    if (process.env.NODE_ENV === 'development') {
+        mainWindow.webContents.openDevTools();
+    }
+
     mainWindow.loadFile(path.join(__dirname, 'views/index.html'));
-    // mainWindow.webContents.openDevTools();
+
+    // Configurar zoom padrão
+    mainWindow.webContents.setZoomFactor(1.0);
 
     mainWindow.on('closed', () => {
         mainWindow = null;
@@ -155,7 +190,8 @@ const menuTemplate = [
 // --- Handlers IPC ---
 ipcMain.on('navigate-to', (event, pageFile) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.loadFile(path.join(__dirname, `views/${pageFile}`));
+        const pagePath = pageFile.endsWith('.html') ? pageFile : `${pageFile}.html`;
+        mainWindow.loadFile(path.join(__dirname, `views/${pagePath}`));
     }
 });
 ipcMain.handle('get-initial-db-status', async () => ({ connected: dbConnectionStatus }));
@@ -223,23 +259,19 @@ ipcMain.handle('add-os', async (event, osData) => {
     }
 });
 
-ipcMain.handle('get-os-list-paginated', async (event, { page = 1, limit = 10, searchTerm = '', filters = {} }) => {
-    if (!dbConnectionStatus) return { success: false, data: [], totalCount: 0, message: 'DB não conectado.' };
+ipcMain.handle('get-os-list-paginated', async (event) => {
+    if (!dbConnectionStatus) return { success: false, data: [], message: 'DB não conectado.' };
     try {
-        const skip = (Number(page) - 1) * Number(limit);
-        let query = {};
-        if (filters.status) query.status = filters.status;
-        if (searchTerm) {
-            const regex = new RegExp(searchTerm.replace(/[-[\]{}()\*+?.,\\^$|\#\\s]/g, '\\$&'), 'i');
-            query.$or = [ { osNumber: { $regex: regex } }, { clientName: { $regex: regex } }, { equipment: { $regex: regex } } ];
-        }
-        const osList = await ServiceOrder.find(query).sort({ osNumber: -1 }).skip(skip).limit(Number(limit)).lean().exec();
-        const totalCount = await ServiceOrder.countDocuments(query).exec();
-        const dataWithStringIds = osList.map(os => ({ ...os, _id: os._id.toString(), clientId: os.clientId?.toString() }));
-        return { success: true, data: dataWithStringIds, totalCount };
+        const osList = await ServiceOrder.find().sort({ osNumber: -1 }).lean().exec();
+        const dataWithStringIds = osList.map(os => ({ 
+            ...os, 
+            _id: os._id.toString(), 
+            clientId: os.clientId?.toString() 
+        }));
+        return { success: true, data: dataWithStringIds };
     } catch (error) {
-        console.error("Erro Mongoose ao buscar OS paginada:", error);
-        return { success: false, data: [], totalCount: 0, message: `Erro ao buscar OS: ${error.message}` };
+        console.error("Erro Mongoose ao buscar OS:", error);
+        return { success: false, data: [], message: `Erro ao buscar OS: ${error.message}` };
     }
 });
 
@@ -434,15 +466,30 @@ ipcMain.handle('find-client-by-cpf', async (event, cpf) => {
 ipcMain.handle('search-clients', async (event, searchTerm) => {
     if (!dbConnectionStatus) return [];
     try {
-        const regex = new RegExp(searchTerm.replace(/[-[\]{}()\*+?.,\\^$|\#\\s]/g, '\\$&'), 'i');
-        const cpfLimpo = searchTerm.replace(/\\D/g, '');
-        let queryConditions = [{ name: { $regex: regex } }];
-        if (cpfLimpo.length > 0 && /^\\d+$/.test(cpfLimpo)) {
-            queryConditions.push({ cpf: { $regex: `^${cpfLimpo}` } });
+        const regex = new RegExp(searchTerm.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i');
+        const cpfLimpo = searchTerm.replace(/\D/g, '');
+        let isCpfSearch = cpfLimpo.length > 0 && /^\d+$/.test(cpfLimpo);
+        if (isCpfSearch) {
+            // Busca por CPF usando aggregate para remover máscara
+            const clients = await Client.aggregate([
+                {
+                    $addFields: {
+                        cpfSemMascara: { $replaceAll: { input: "$cpf", find: ".", replacement: "" } }
+                    }
+                },
+                {
+                    $match: {
+                        cpfSemMascara: { $regex: `^${cpfLimpo}` }
+                    }
+                },
+                { $limit: 10 }
+            ]);
+            return clients.map(client => ({ ...client, _id: client._id.toString() }));
+        } else {
+            // Busca por nome
+            const clients = await Client.find({ name: { $regex: regex } }).sort({ name: 1 }).limit(10).lean().exec();
+            return clients.map(client => ({ ...client, _id: client._id.toString() }));
         }
-        const query = { $or: queryConditions };
-        const clients = await Client.find(query).sort({name: 1}).limit(10).lean().exec();
-        return clients.map(client => ({ ...client, _id: client._id.toString() }));
     } catch (error) {
         console.error("Erro Mongoose ao buscar clientes (search-clients):", error);
         return [];
@@ -639,6 +686,25 @@ ipcMain.handle('generate-os-abertas-report', async () => {
     }
 });
 
+// Handler para diálogo de confirmação
+ipcMain.handle('show-confirm-dialog', async (event, options) => {
+    const { type = 'question', title = 'Confirmação', message, buttons = ['Cancelar', 'Confirmar'], defaultId = 1, cancelId = 0 } = options;
+    
+    const result = await dialog.showMessageBox({
+        type,
+        title,
+        message,
+        buttons,
+        defaultId,
+        cancelId,
+        noLink: true
+    });
+
+    return {
+        response: result.response,
+        confirmed: result.response === defaultId
+    };
+});
 
 // --- Lógica App Electron ---
 app.whenReady().then(() => {

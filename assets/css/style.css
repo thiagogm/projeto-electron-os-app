@@ -1,13 +1,71 @@
 /* assets/css/style.css */
 
-/* Estilos Globais e do Body (ajustados a partir do seu CSS) */
+/* Variáveis de cores e espaçamento */
+:root {
+    /* Cores principais */
+    --primary-color: #2c5282;
+    --primary-hover: #2b6cb0;
+    --secondary-color: #4a5568;
+    --secondary-hover: #2d3748;
+    
+    /* Cores de fundo */
+    --bg-light: #e2e8f0;      /* Cinza mais escuro para o fundo principal */
+    --bg-white: #ffffff;
+    --bg-hover: #cbd5e0;      /* Hover mais escuro */
+    --bg-section: #f1f5f9;    /* Fundo das seções, um pouco mais claro que o bg-light */
+    --bg-input: #ffffff;      /* Fundo dos inputs, mantendo branco para contraste */
+    --bg-footer: #2d3748;     /* Cor de fundo escura para o footer */
+    
+    /* Cores de texto */
+    --text-primary: #1a202c;
+    --text-secondary: #2d3748;
+    --text-muted: #4a5568;
+    --text-footer: #e2e8f0;   /* Cor de texto clara para o footer */
+    
+    /* Cores de borda */
+    --border-color: #a0aec0;  /* Borda mais escura */
+    --border-focus: #4299e1;
+    --border-footer: #4a5568; /* Cor de borda para o footer */
+    
+    /* Cores de feedback */
+    --success-color: #38a169;
+    --danger-color: #e53e3e;
+    --warning-color: #d69e2e;
+    
+    /* Sombras */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.1);
+    --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    
+    /* Espaçamento */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    
+    /* Bordas */
+    --border-radius-sm: 0.25rem;
+    --border-radius-md: 0.5rem;
+    --border-radius-lg: 0.75rem;
+}
+
+/* Estilos base */
 body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    color: #1e293b; /* slate-700 - Cor principal do texto */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+    line-height: 1.5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 1rem; 
     margin: 0;
-    padding-top: 90px; /* Espaço para o cabeçalho fixo */
-    padding-bottom: 70px; /* Espaço para o rodapé fixo */
+    padding: 0;
+    position: relative;
+    padding-bottom: 60px; /* Altura do footer */
     -webkit-font-smoothing: antialiased; /* Melhora a renderização da fonte */
     -moz-osx-font-smoothing: grayscale;  /* Melhora a renderização da fonte */
 }
@@ -20,246 +78,491 @@ body {
 
 /* Cabeçalho da Página */
 .page-header {
-    background-color: #ffffff; /* Branco, para contrastar com o novo fundo do body */
-    padding: 1rem 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    z-index: 1030; 
+    display: none;
 }
 
+/* Título da página */
 .page-title {
+    font-size: 1.25rem;
     font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 0;
-    font-size: 1.75rem;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
 }
 
+/* Botões de navegação */
 .nav-btn-header {
-    padding: 0.25rem 0.75rem !important;
-    font-size: 1rem !important;
-    border-radius: 20px !important;
-    line-height: 1.2 !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-}
-.nav-btn-header i {
-    margin-right: 0.35rem;
-}
-
-.search-results-absolute {
-    position: absolute;
-    width: calc(100% - 3rem); /* Ajustar com base no padding do .page-header .container-fluid */
-    left: 1.5rem;
-    z-index: 1000; /* Abaixo do header, acima do conteúdo */
-    background-color: #fff;
-    border: 1px solid #dee2e6;
-    border-top: none;
-    border-radius: 0 0 0.25rem 0.25rem;
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    min-width: 100px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+    background-color: var(--bg-section);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-sm);
 }
 
-/* Contêiner Principal do Formulário */
-.form-container-main {
-    background-color: #ffffff; /* Branco, para se destacar do fundo do body mais escuro */
-    padding: 2rem 2.5rem; 
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(30,41,59,0.08), 0 3px 10px rgba(100,116,139,0.06);
-    margin-top: 2rem; 
-    margin-bottom: 2rem;
-    max-width: 1400px; 
-    margin-left: auto;
-    margin-right: auto;
+.nav-btn-header:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--border-focus);
+    color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
 }
 
-.text-instructions {
-    color: #475569; /* slate-600 */
-    font-size: 0.95rem;
+.nav-btn-header .icon-nav {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2.5;
 }
 
-/* Seções do Formulário (Fieldset) */
+/* Seções do formulário */
 .form-section {
-    border: 1px solid #e2e8f0; /* slate-200 */
+    background-color: var(--bg-section);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    background-color: #f8fafc; /* slate-50, fundo levemente diferente para a seção */
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    z-index: 1;
+}
+
+.form-section:hover {
+    box-shadow: var(--shadow-xl);
+    transition: box-shadow 0.2s ease-in-out;
 }
 
 .form-section-legend {
+    font-size: 0.9375rem;
     font-weight: 600;
-    color: #334155; /* slate-700 */
-    font-size: 1.1rem;
-    padding: 0 0.75rem;
-    width: auto; /* Para o legend não ocupar toda a largura */
-    margin-bottom: 1rem; /* Espaçamento após o legend */
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    padding: 0;
+    border: none;
+    width: auto;
 }
 
-/* Estilos para Controles de Formulário (adaptado do seu CSS) */
+/* Campos do formulário */
 .form-label {
-    font-weight: 600;
-    color: #1e293b; /* slate-800 */
-    margin-bottom: 0.35rem;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
 }
 
 .form-control,
-.form-select { /* Adicionado .form-select */
-    background-color: #ffffff;
-    color: #334155; /* slate-700 */
-    border: 1px solid #cbd5e1; /* slate-300 */
+.form-select {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    /* box-shadow: 0 1px 2px rgba(0,0,0,0.05); */ /* Sombra sutil */
-    font-size: 1rem;
-    padding: 0.5rem 0.85rem; /* Padding ajustado */
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    width: 100%; /* Ocupa a coluna do grid */
-    max-width: none; /* Remove o max-width fixo que você tinha */
-}
-textarea.form-control {
-    min-height: calc(1.5em + 1rem + 2px); /* Altura mínima padrão */
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    transition: all 0.2s ease-in-out;
+    box-shadow: var(--shadow-inner);
 }
 
 .form-control:focus,
 .form-select:focus {
-    background-color: #ffffff;
-    color: #0f172a; /* slate-900 */
-    border-color: #3b82f6; /* blue-500 */
-    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
-    outline: 0;
+    background-color: var(--bg-input);
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15), var(--shadow-inner);
+    transform: translateY(-1px);
 }
 
-/* Validação (adaptado do seu CSS) */
-.form-control.is-valid,
-.form-select.is-valid {
-    border-color: #10b981 !important; /* green-500 */
-    /* background-image para ícone de check pode ser adicionado aqui */
-}
-.form-control.is-valid:focus,
-.form-select.is-valid:focus {
-    border-color: #10b981 !important;
-    box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25);
+.form-control::placeholder {
+    color: var(--text-muted);
 }
 
-.form-control.is-invalid,
-.form-select.is-invalid {
-    border-color: #ef4444 !important; /* red-500 */
-    /* background-image para ícone de erro pode ser adicionado aqui */
-}
-.form-control.is-invalid:focus,
-.form-select.is-invalid:focus {
-    border-color: #ef4444 !important;
-    box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.25);
+/* Botões do formulário */
+.btn {
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+    box-shadow: var(--shadow-sm);
 }
 
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-color: transparent;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-outline-secondary {
+    color: var(--secondary-color);
+    border-color: var(--border-color);
+    background-color: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--secondary-color);
+    color: var(--secondary-hover);
+}
+
+/* Feedback de validação */
 .invalid-feedback {
-    font-size: 0.875em;
-    color: #dc3545; /* Bootstrap default danger color */
-    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--danger-color);
+    margin-top: var(--spacing-xs);
 }
 
-/* Botão de busca de CEP */
-#cepSearchButton {
-    border-left: none; /* Remove borda dupla */
-}
-#cepSearchButton:hover {
-    background-color: #e9ecef;
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+    border-color: var(--danger-color);
+    background-color: var(--bg-input);
 }
 
-/* Botões de Ação do Formulário */
-.form-actions {
-    border-top: 1px solid #e2e8f0; /* slate-200 */
-    margin-top: 2rem; /* Espaço antes dos botões */
-    padding-top: 1.5rem;
+.was-validated .form-control:valid,
+.form-control.is-valid {
+    border-color: var(--success-color);
+    background-color: var(--bg-input);
 }
 
-.form-actions .btn-lg {
-    padding: 0.65rem 1.5rem;
-    font-size: 1rem;
+/* Resultados de busca */
+.search-results-absolute {
+    background-color: var(--bg-section);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+}
+
+.list-group-item {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    border-color: var(--border-color);
+    background-color: var(--bg-section);
+    transition: all 0.2s ease-in-out;
+}
+
+.list-group-item:hover {
+    background-color: var(--bg-hover);
+    transform: translateX(2px);
+}
+
+/* Instruções e textos auxiliares */
+.text-instructions {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Footer */
+.app-footer {
+    background-color: var(--bg-footer);
+    border-top: 1px solid var(--border-footer);
+    box-shadow: var(--shadow-lg);
+    color: var(--text-footer);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: auto;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+}
+
+.app-footer .container-fluid {
+    max-width: 1400px;
+    width: 100%;
+}
+
+.app-footer p {
+    margin: 0;
+    color: var(--text-footer);
     font-weight: 500;
 }
-.form-actions .btn-lg i {
-    margin-right: 0.5rem;
+
+/* Status do banco de dados no footer */
+#dbStatusIcon {
+    transition: color 0.3s ease;
 }
 
-/* Rodapé (mantendo seu estilo, apenas ajustando se necessário) */
-.app-footer {
-    background-color: #343a40; /* Bootstrap dark - um cinza bem escuro */
-    color: #adb5bd; /* Texto base cinza claro para contraste */
-    border-top: 1px solid #495057; /* Borda sutil um pouco mais clara */
-    padding-top: 0.75rem !important;
-    padding-bottom: 0.75rem !important;
-    font-size: 0.875em;
+#dbStatusIcon.connected {
+    color: var(--success-color);
 }
 
-/* Garante que spans dentro do footer herdem a cor ou tenham a cor base clara */
-.app-footer span {
-    color: inherit; /* Herda #adb5bd */
+#dbStatusIcon.disconnected {
+    color: var(--danger-color);
 }
 
-.app-footer #copyrightText {
-    color: #ced4da; /* Um pouco mais claro para o copyright */
-}
-
-.app-footer #dbStatusIcon {
-    width: 16px;
-    height: 16px;
-    stroke-width: 2.5;
-    vertical-align: text-bottom;
-    /* A cor será definida pelas classes de status */
-}
-
-/* Cores para o ícone e texto de status do DB (CONTRASTE COM FUNDO ESCURO) */
-.icon-status-db-disconnected,
-.app-footer .text-status-disconnected {
-    color: #ff8080 !important; /* Vermelho claro e vibrante */
-}
-
-.icon-status-db-connected,
-.app-footer .text-status-connected {
-    color: #50e3c2 !important; /* Verde/Turquesa claro e vibrante */
-}
-
-.app-footer .text-status-verifying {
-    color: #f1c40f !important; /* Amarelo/Laranja para "Verificando..." */
-}
-
-/* Se o texto "Conectado", "Desconectado" precisar de mais peso */
-.app-footer #dbStatusText {
-    font-weight: 500; 
-}
-
-/* Ajustes para responsividade (se necessário, além do grid do Bootstrap) */
-@media (max-width: 992px) { /* Telas médias e abaixo */
-    .page-header {
-        padding: 0.75rem 1rem;
+/* Ajustes para responsividade do footer */
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 48px; /* Altura do footer em telas pequenas */
     }
-    .page-title {
-        font-size: 1.5rem;
+    
+    main {
+        margin-bottom: 48px;
+    }
+    
+    .app-footer {
+        font-size: 0.75rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .app-footer .container-fluid {
+        flex-direction: column;
+        gap: var(--spacing-xs);
         text-align: center;
-        margin-bottom: 0.75rem;
     }
-    .page-header .col-md-4 { /* Colunas do header em telas menores */
-        text-align: center !important; /* Centraliza tudo */
-    }
-     .page-header .input-group {
-        margin-bottom: 0.5rem;
-    }
-    .form-container-main {
-        padding: 1.5rem 1rem;
-        margin-top: 1rem;
-    }
+}
+
+/* Ajustes para garantir que o conteúdo não fique sob o footer */
+.form-actions {
+    margin-bottom: 60px; /* Espaço extra para não ficar sob o footer */
 }
 
 @media (max-width: 768px) {
-    body {
-        padding-top: 150px; /* Mais espaço para header que pode quebrar em mais linhas */
+    .form-actions {
+        margin-bottom: 56px;
     }
-     .form-actions .btn {
-        display: block;
-        width: 100%;
-        margin-bottom: 0.5rem;
+}
+
+/* Ajustes para garantir que modais e dropdowns fiquem acima do footer */
+.modal,
+.dropdown-menu,
+.search-results-absolute {
+    z-index: 1050; /* Maior que o z-index do footer */
+}
+
+/* Ajustes para garantir que o footer fique sempre visível */
+.os-container,
+.client-container,
+.index-container {
+    min-height: calc(100vh - 60px);
+    position: relative;
+    padding-bottom: 60px;
+}
+
+@media (max-width: 768px) {
+    .os-container,
+    .client-container,
+    .index-container {
+        min-height: calc(100vh - 50px);
+        padding-bottom: 50px;
     }
-    .form-actions .btn-lg.me-2 {
-        margin-right: 0 !important;
+}
+
+/* Ajustes específicos para campos de custo */
+.form-control[readonly] {
+    background-color: var(--bg-hover);
+    cursor: not-allowed;
+    box-shadow: var(--shadow-inner);
+    opacity: 0.9;
+}
+
+#totalCost {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: var(--shadow-inner);
+}
+
+/* Ajustes para campos de data e status */
+#entryDate {
+    background-color: var(--bg-hover);
+    cursor: not-allowed;
+    box-shadow: var(--shadow-inner);
+}
+
+#statusOs {
+    font-weight: 500;
+}
+
+/* Ajustes para o campo de cliente selecionado */
+#selectedClientInfo {
+    background-color: var(--bg-hover);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: var(--shadow-inner);
+}
+
+/* Ajustes para botões de ação */
+.btn-lg {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+}
+
+/* Ajustes para campos de texto longo */
+textarea.form-control {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Ajustes para campos numéricos */
+input[type="number"].form-control {
+    text-align: right;
+}
+
+/* Ajustes para campos obrigatórios */
+.required-field::after {
+    content: " *";
+    color: var(--danger-color);
+}
+
+/* Ajustes para campos desabilitados */
+.form-control:disabled,
+.form-control[readonly] {
+    background-color: var(--bg-hover);
+    box-shadow: var(--shadow-inner);
+    opacity: 0.9;
+}
+
+/* Ajustes para campos de busca */
+.input-group {
+    box-shadow: var(--shadow-sm);
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+.input-group:focus-within {
+    box-shadow: var(--shadow-md);
+}
+
+.input-group .form-control {
+    border-right: none;
+    box-shadow: none;
+}
+
+.input-group .btn {
+    border-left: none;
+    box-shadow: none;
+}
+
+/* Ajustes para campos de peças */
+.part-row {
+    background-color: var(--bg-section);
+    padding: var(--spacing-sm);
+    border-radius: 6px;
+    margin-bottom: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease-in-out;
+}
+
+.part-row:hover {
+    background-color: var(--bg-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.remove-part-button {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+    background-color: white;
+    padding: 0.375rem 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+}
+
+.remove-part-button:hover {
+    background-color: var(--danger-color);
+    color: white;
+    border-color: var(--danger-color);
+}
+
+.remove-part-button i {
+    font-size: 1rem;
+    width: 16px;
+    height: 16px;
+    stroke-width: 2.5px;
+}
+
+/* Ajuste específico para o botão na linha de peças */
+.part-row .remove-part-button {
+    height: 38px;
+    width: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.part-row .remove-part-button i {
+    margin: 0;
+    color: inherit;
+}
+
+/* Ajustes para responsividade */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: var(--spacing-sm);
+    }
+    
+    .form-section {
+        padding: var(--spacing-md);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .form-section:hover {
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .btn:hover {
+        transform: none;
+    }
+    
+    .part-row:hover {
+        transform: none;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
     }
 }
 
@@ -285,7 +588,6 @@ textarea.form-control {
     }
 }
 
-
 /* Estilo para informações do cliente selecionado */
 #selectedClientInfo.form-control-plaintext {
     background-color: #f8f9fa; /* Um fundo leve para destacar */
@@ -293,27 +595,57 @@ textarea.form-control {
 }
 
 /* Ajustes para a seção de peças */
-.part-row .form-control-sm {
-    font-size: 0.875rem; /* Torna os campos de peça um pouco menores */
-    padding: 0.25rem 0.5rem;
+.part-row {
+    margin-bottom: 0.75rem;
+    align-items: flex-end;
 }
+
+.part-row .form-label {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    color: #495057;
+}
+
+.part-row .form-control-sm {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    height: calc(1.5em + 0.5rem + 2px);
+}
+
+.part-row .invalid-feedback {
+    font-size: 0.75rem;
+    margin-top: 0.125rem;
+}
+
+.part-row .remove-part-button {
+    padding: 0.25rem 0.5rem;
+    line-height: 1;
+    height: calc(1.5em + 0.5rem + 2px);
+}
+
 .part-row .remove-part-button i {
-    font-size: 0.9rem; /* Ajusta o tamanho do ícone X */
+    font-size: 1rem;
     vertical-align: middle;
 }
 
-/* Espaçamento vertical entre linhas de peças */
-.part-row {
-    margin-bottom: 0.5rem;
+.part-row .part-total-price {
+    background-color: #f8f9fa !important;
+    font-weight: 500;
 }
 
-/* Espaçamento entre campos quando empilhados em telas pequenas */
-@media (max-width: 767.98px) {
-    .part-row > div {
-        margin-bottom: 0.5rem;
+/* Ajuste para telas pequenas */
+@media (max-width: 575.98px) {
+    .part-row {
+        margin-bottom: 1rem;
     }
-    .part-row > div:last-child {
-        margin-bottom: 0;
+    
+    .part-row .col-sm-1 {
+        text-align: left !important;
+        margin-top: 0.5rem;
+    }
+    
+    .part-row .remove-part-button {
+        margin-top: 0.25rem;
     }
 }
 
@@ -380,3 +712,137 @@ textarea.form-control {
 }
 
 /* ... (Resto do seu style.css) ... */
+
+/* Ajuste para o container principal para compensar o header fixo */
+.container-fluid {
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+/* Ajuste para o conteúdo principal */
+main {
+    flex: 1;
+    padding: var(--spacing-lg);
+    margin-bottom: 60px; /* Altura do footer */
+}
+
+/* Ajuste para o row do header */
+.page-header .row {
+    margin: 0;
+    align-items: center;
+}
+
+/* Ajuste para os col do header */
+.page-header .col-md-4 {
+    padding: 0 0.5rem;
+}
+
+/* Ajuste para o input de busca no header */
+.page-header .input-group {
+    height: 28px;
+}
+
+.page-header .input-group .form-control {
+    height: 28px;
+    font-size: 0.8125rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.page-header .input-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8125rem;
+    height: 28px;
+}
+
+/* Ajuste para os resultados da busca */
+#searchResults {
+    margin-top: 0.25rem;
+    max-height: 180px;
+    z-index: 1000;
+}
+
+#searchResults .list-group-item {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8125rem;
+}
+
+/* Ajustes para a nova estrutura */
+.body-form-page {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ajustes para o conteúdo principal */
+.row {
+    margin-bottom: 0.5rem;
+}
+
+/* Ajustes para os campos do formulário */
+.form-group {
+    margin-bottom: 0.75rem;
+}
+
+/* Ajustes para os botões do formulário */
+.btn {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+    line-height: 1.5;
+}
+
+/* Classes de Status do Banco de Dados */
+.text-status-connected {
+    color: var(--success-color) !important;
+}
+
+.text-status-disconnected {
+    color: var(--danger-color) !important;
+}
+
+.text-status-verifying {
+    color: var(--warning-color) !important;
+}
+
+.icon-status-db-connected {
+    color: var(--success-color) !important;
+}
+
+.icon-status-db-disconnected {
+    color: var(--danger-color) !important;
+}
+
+/* Classes de Ícones Padronizadas */
+.icon-btn {
+    width: 18px;
+    height: 18px;
+    vertical-align: text-bottom;
+}
+
+.icon-btn-sm {
+    width: 16px;
+    height: 16px;
+    vertical-align: text-bottom;
+}
+
+.icon-nav {
+    width: 18px;
+    height: 18px;
+    vertical-align: text-bottom;
+}
+
+.icon-xl {
+    width: 32px;
+    height: 32px;
+}
+
+/* Classes de Status de Mensagens */
+.status-message {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    margin: 0 1rem;
+    text-align: center;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

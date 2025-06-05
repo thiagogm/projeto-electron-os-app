@@ -30,6 +30,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     deleteOs: (osId) => ipcRenderer.invoke('delete-os', osId),
     getNextOsNumber: () => ipcRenderer.invoke('get-next-os-number'),
 
+    // Diálogo de confirmação nativo
+    showConfirmDialog: (options) => ipcRenderer.invoke('show-confirm-dialog', options),
+
     // Utilitários
     fetchCep: (cep) => ipcRenderer.invoke('fetch-cep', cep),
 
@@ -48,4 +51,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     generateClientReport: () => ipcRenderer.invoke('generate-client-report'),
     generateOsFinalizadasReport: () => ipcRenderer.invoke('generate-os-finalizadas-report'),
     generateOsAbertasReport: () => ipcRenderer.invoke('generate-os-abertas-report'),
+    onReportGenerated: (callback) => {
+        const listener = (_event, result) => callback(result);
+        ipcRenderer.on('report-generated', listener);
+        return () => ipcRenderer.removeListener('report-generated', listener);
+    },
 });

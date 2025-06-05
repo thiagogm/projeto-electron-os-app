@@ -1,0 +1,145 @@
+/* Feather Icons - Estilos Base */
+[data-feather] {
+    display: inline-block;
+    vertical-align: middle;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+/* Tamanhos de ícones */
+.icon-sm {
+    width: 1em;
+    height: 1em;
+}
+
+.icon-md {
+    width: 1.5em;
+    height: 1.5em;
+}
+
+.icon-lg {
+    width: 2em;
+    height: 2em;
+}
+
+.icon-xl {
+    width: 2.5em;
+    height: 2.5em;
+}
+
+/* Ícones em botões */
+.icon-btn {
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: -0.2em;
+}
+
+.icon-btn-sm {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.15em;
+}
+
+/* Ícones em navegação */
+.icon-nav {
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: -0.2em;
+}
+
+/* Ícones em cards */
+.icon-circle {
+    width: 3em;
+    height: 3em;
+    padding: 0.75em;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cores específicas para ícones */
+.icon-primary {
+    color: var(--primary-color);
+}
+
+.icon-success {
+    color: var(--success-color);
+}
+
+.icon-danger {
+    color: var(--danger-color);
+}
+
+.icon-warning {
+    color: var(--warning-color);
+}
+
+.icon-info {
+    color: var(--info-color);
+}
+
+/* Força a exibição dos ícones */
+[data-feather] {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Estados dos ícones */
+[data-feather].icon-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+[data-feather].icon-clickable {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+[data-feather].icon-clickable:hover {
+    transform: scale(1.1);
+}
+
+/* Ícones em badges */
+.badge [data-feather] {
+    width: 0.875em;
+    height: 0.875em;
+    margin-right: 0.25em;
+}
+
+/* Ícones em tabelas */
+.table [data-feather] {
+    width: 1.1em;
+    height: 1.1em;
+}
+
+/* Ícones em formulários */
+.form-label [data-feather] {
+    margin-right: 0.5em;
+}
+
+/* Ícones em toasts */
+.toast [data-feather] {
+    margin-right: 0.5em;
+}
+
+/* Ícones em alerts */
+.alert [data-feather] {
+    margin-right: 0.5em;
+}
+
+/* Ícones em modais */
+.modal-title [data-feather] {
+    margin-right: 0.5em;
+}
+
+/* Ícones em dropdowns */
+.dropdown-item [data-feather] {
+    margin-right: 0.5em;
+    width: 1.1em;
+    height: 1.1em;
+}
