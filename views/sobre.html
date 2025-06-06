@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://viacep.com.br; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net https://unpkg.com;">
-    <title>Sobre o VoltDesk</title>
+    <title>Sobre</title>
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/feather.css">
     <style>
         :root {
             --primary-color: #0069d9;
@@ -18,15 +22,11 @@
             --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         html, body {
             height: 100vh;
             width: 100vw;
+            margin: 0;
+            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: linear-gradient(135deg, var(--background) 0%, #e3f2fd 100%);
             overflow: hidden;
@@ -40,32 +40,36 @@
             border-radius: 16px;
             box-shadow: var(--shadow);
             padding: 2rem;
-            max-width: 380px;
             width: 90%;
+            max-width: 480px;
             text-align: center;
             position: relative;
             border: 1px solid var(--border-color);
+            animation: fadeInUp 0.6s ease-out;
         }
 
-        .logo {
-            width: 60px;
-            height: 60px;
-            background: var(--primary-color);
-            border-radius: 12px;
-            margin: 0 auto 1rem;
+        .logo-container {
+            width: 200px;
+            height: auto;
+            margin: 0 auto 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 105, 217, 0.2);
+            background: none;
+            border-radius: 0;
+        }
+
+        .logo {
+            width: 100%;
+            height: auto;
         }
 
         .app-title {
-            font-size: 1.75rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--text-dark);
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
             letter-spacing: -0.025em;
         }
 
@@ -73,54 +77,63 @@
             font-size: 0.875rem;
             color: var(--text-medium);
             background: var(--background);
-            padding: 0.25rem 0.75rem;
+            padding: 0.25rem 1rem;
             border-radius: 20px;
             display: inline-block;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
         }
 
         .app-description {
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: var(--text-medium);
-            line-height: 1.5;
-            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
         }
 
         .github-link {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             text-decoration: none;
             color: var(--primary-color);
             font-weight: 500;
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--primary-color);
-            border-radius: 8px;
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
             transition: all 0.2s ease;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            background: white;
         }
 
-        .github-link:hover {
+        .github-link:hover, .github-link:focus {
             background: var(--primary-color);
             color: white;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 105, 217, 0.2);
+            outline: none;
+        }
+
+        .github-link:focus-visible {
+            outline: 3px solid rgba(0, 105, 217, 0.3);
+            outline-offset: 2px;
         }
 
         .github-icon {
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
         }
 
         .footer {
-            font-size: 0.8rem;
+            font-size: 0.875rem;
             color: var(--text-light);
-            padding-top: 1rem;
+            padding-top: 1.5rem;
             border-top: 1px solid var(--border-color);
             margin-top: 0.5rem;
         }
 
-        /* Animação de entrada */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -132,51 +145,68 @@
             }
         }
 
-        .about-container {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
         /* Responsividade para telas muito pequenas */
-        @media (max-height: 500px) {
+        @media (max-height: 600px) {
             .about-container {
                 padding: 1.5rem;
-                max-width: 350px;
+                max-width: 420px;
             }
             
             .app-title {
-                font-size: 1.5rem;
+                font-size: 1.75rem;
+            }
+            
+            .logo-container {
+                width: 70px;
+                height: 70px;
+                margin-bottom: 1rem;
             }
             
             .logo {
-                width: 50px;
-                height: 50px;
-                font-size: 1.25rem;
+                font-size: 1.75rem;
+            }
+            
+            .app-description {
+                margin-bottom: 1.5rem;
+                font-size: 0.95rem;
+            }
+            
+            .github-link {
+                margin-bottom: 1.5rem;
+                padding: 0.6rem 1.25rem;
             }
         }
     </style>
 </head>
-<body>
-    <div class="about-container">
-        <div class="logo">V</div>
+<body role="dialog" aria-labelledby="aboutTitle" aria-modal="true">
+    <div class="about-container" role="document">
+        <div class="logo-container" aria-hidden="true">
+            <img src="../assets/icons/Logo-VoltDesk.png" 
+                 alt="Logo" 
+                 class="logo"
+                 width="200"
+                 height="auto"
+                 loading="eager">
+        </div>
         
-        <h1 class="app-title">VoltDesk</h1>
+        <h1 id="aboutTitle" class="app-title">Sistema de Gestão</h1>
         
-        <span class="app-version">Versão 1.0.0</span>
+        <span class="app-version" aria-label="Versão do aplicativo">Versão 1.0.0</span>
         
         <p class="app-description">
             Sistema de gestão para eletricistas. Cadastre clientes, 
-            gere ordens de serviço e organize seu trabalho de forma prática.
+            gere ordens de serviço e organize seu trabalho de forma prática e eficiente.
         </p>
         
-        <a href="#" id="githubLink" class="github-link">
-            <svg class="github-icon" viewBox="0 0 24 24" fill="currentColor">
+        <a href="#" id="githubLink" class="github-link" role="button" aria-label="Acessar repositório no GitHub">
+            <svg class="github-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
             </svg>
             Repositório no GitHub
         </a>
         
-        <div class="footer">
-            Desenvolvido por Thiago &copy; <span id="currentYear"></span>
+        <div class="footer" role="contentinfo">
+            Desenvolvido por Thiago &copy; <span id="currentYear" aria-label="Ano atual"></span>
         </div>
     </div>
 
@@ -186,15 +216,24 @@
         // Configurar ano atual
         document.getElementById('currentYear').textContent = new Date().getFullYear();
         
-        // Configurar link do GitHub
+        // Configurar link do GitHub para abrir no navegador padrão
         document.getElementById('githubLink').addEventListener('click', (event) => {
             event.preventDefault();
             const githubUrl = 'https://github.com/thiagogm/projeto-electron-os-app';
             
+            // Usar o shell do Electron para abrir no navegador padrão
             if (window.electronAPI && typeof window.electronAPI.openExternal === 'function') {
                 window.electronAPI.openExternal(githubUrl);
             } else {
-                window.open(githubUrl, '_blank');
+                // Fallback para navegador
+                window.open(githubUrl, '_blank', 'noopener,noreferrer');
+            }
+        });
+
+        // Fechar a janela ao pressionar ESC
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && window.electronAPI && typeof window.electronAPI.closeWindow === 'function') {
+                window.electronAPI.closeWindow();
             }
         });
     </script>

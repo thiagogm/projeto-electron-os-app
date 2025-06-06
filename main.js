@@ -194,6 +194,24 @@ ipcMain.on('navigate-to', (event, pageFile) => {
         mainWindow.loadFile(path.join(__dirname, `views/${pagePath}`));
     }
 });
+
+// Handler para fechar janela (usado na janela Sobre)
+ipcMain.on('close-window-from-ui', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win && !win.isDestroyed()) {
+        win.close();
+    }
+});
+
+// Handler para abrir links externos no navegador padrão
+ipcMain.on('open-external-from-ui', (event, url) => {
+    if (url && typeof url === 'string') {
+        shell.openExternal(url).catch(err => {
+            console.error('Erro ao abrir link externo:', err);
+        });
+    }
+});
+
 ipcMain.handle('get-initial-db-status', async () => ({ connected: dbConnectionStatus }));
 
 async function getNextOsNumberFromDB_Native() {

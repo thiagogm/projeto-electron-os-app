@@ -41,6 +41,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     reloadWindow: () => ipcRenderer.send('reload-window-from-ui'),
     toggleDevTools: () => ipcRenderer.send('toggle-dev-tools-from-ui'),
     openExternal: (url) => ipcRenderer.send('open-external-from-ui', url),
+    closeWindow: () => ipcRenderer.send('close-window-from-ui'),
 
     // Configurações (quando for implementar futuramente)
     // getSettings: () => ipcRenderer.invoke('get-settings'),
